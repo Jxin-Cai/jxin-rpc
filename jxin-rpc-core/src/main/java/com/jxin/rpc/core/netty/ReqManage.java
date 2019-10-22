@@ -18,6 +18,10 @@ public class ReqManage implements Closeable {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledFuture scheduledFuture;
 
+    /**
+     * 在构造器中开启清理超时RspFuture的定时job
+     * @author 蔡佳新
+     */
     public ReqManage() {
         scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::removeTimeoutFutures, 0, LOOP_TIME, TimeUnit.SECONDS);
     }
