@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.netty;
+package com.jxin.rpc.core.netty.msg.manage;
 
 import com.jxin.rpc.core.netty.msg.RspMsg;
 import lombok.Builder;
@@ -15,7 +15,10 @@ import java.util.concurrent.CompletableFuture;
 @Data
 @Builder
 public class RspFuture {
+    /**请求id*/
     private final int requestId;
+    /**未来响应消息实体*/
     private final CompletableFuture<RspMsg> future;
+    /**时间截*/
     private final long timestamp;
 }

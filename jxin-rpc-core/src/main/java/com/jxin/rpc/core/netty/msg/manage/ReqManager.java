@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.netty;
+package com.jxin.rpc.core.netty.msg.manage;
 
 import java.io.Closeable;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.concurrent.*;
  * @version 1.0
  * @since 2019/10/22 15:38
  */
-public class ReqManage implements Closeable {
+public class ReqManager implements Closeable {
     /**定时任务的调用间隔*/
     private static final long LOOP_TIME = 10L;
     /**线程安全的 全局响应实体容器*/
@@ -22,7 +22,7 @@ public class ReqManage implements Closeable {
      * 在构造器中开启清理超时RspFuture的定时job
      * @author 蔡佳新
      */
-    public ReqManage() {
+    public ReqManager() {
         scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::removeTimeoutFutures, 0, LOOP_TIME, TimeUnit.SECONDS);
     }
 
