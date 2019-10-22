@@ -13,9 +13,9 @@ import lombok.Data;
 @Builder
 public class ReqHeader {
     /**请求id*/
-    private int requestId;
+    private final int requestId;
     /**协议版本*/
-    private Integer version;
+    private final Integer version;
     /**请求类型*/
-    private Integer type;
+    private final Integer type;
 }

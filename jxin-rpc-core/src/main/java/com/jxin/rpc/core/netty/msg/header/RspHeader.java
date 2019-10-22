@@ -13,13 +13,13 @@ import lombok.Data;
 @Builder
 public class RspHeader {
     /**请求id*/
-    private int requestId;
+    private final int requestId;
     /**协议版本*/
-    private Integer version;
+    private final Integer version;
     /**请求类型*/
-    private Integer type;
+    private final Integer type;
     /**响应code*/
-    private Integer code;
+    private final Integer code;
     /**异常消息*/
-    private String errMsg;
+    private final String errMsg;
 }
