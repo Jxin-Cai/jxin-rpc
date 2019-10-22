@@ -18,5 +18,6 @@ public abstract class Header {
     /**请求类型*/
     private final Integer type;
 
+
     public abstract int length();
 }

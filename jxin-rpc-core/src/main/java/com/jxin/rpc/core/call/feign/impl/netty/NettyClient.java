@@ -2,6 +2,8 @@ package com.jxin.rpc.core.call.feign.impl.netty;
 
 import com.jxin.rpc.core.call.feign.Feign;
 import com.jxin.rpc.core.call.feign.FeignClient;
+import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.req.ReqEncoder;
+import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.rsp.RspDecoder;
 import com.jxin.rpc.core.call.msg.manage.ReqManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -12,7 +14,6 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,8 +99,8 @@ public class NettyClient implements FeignClient {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
-                        .addLast(new ResponseDecoder())
-                        .addLast(new RequestEncoder())
+                        .addLast(new RspDecoder())
+                        .addLast(new ReqEncoder())
                         .addLast(new ResponseInvocation(inFlightRequests));
             }
         };

@@ -1,7 +1,7 @@
 package com.jxin.rpc.core.call.msg.header;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2019/10/22 15:06
  */
+@Setter
+@Getter
 public class RspHeader extends Header{
     /**响应code*/
     private final Integer code;
@@ -33,11 +35,8 @@ public class RspHeader extends Header{
      */
     @Override
     public int length() {
-        return Integer.BYTES
-               + Integer.BYTES
-               + Integer.BYTES
-               + Integer.BYTES
-               + Integer.BYTES
-               + (errMsg == null ? 0 : errMsg.getBytes(StandardCharsets.UTF_8).length);
+        /* (requestId.size() + version.size() + type.size() + code.size() + msg.length.size()) + msg.size()*/
+        return (Integer.BYTES * 5)
+               + (StringUtils.isBlank(errMsg) ? 0 : errMsg.getBytes(StandardCharsets.UTF_8).length);
     }
 }
