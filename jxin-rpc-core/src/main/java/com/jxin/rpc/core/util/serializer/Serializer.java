@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.serializer;
+package com.jxin.rpc.core.util.serializer;
 
 
 import com.jxin.rpc.core.consts.DataEnum;

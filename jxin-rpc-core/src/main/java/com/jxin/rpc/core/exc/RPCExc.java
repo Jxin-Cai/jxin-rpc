@@ -7,4 +7,10 @@ package com.jxin.rpc.core.exc;
  * @since 2019/10/22 16:59
  */
 public class RPCExc extends RuntimeException{
+    public RPCExc(String messageTemplate, Object... params){
+        super(String.format(messageTemplate, params));
+    }
+    public RPCExc(){
+        super();
+    }
 }

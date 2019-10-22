@@ -1,7 +1,7 @@
-package com.jxin.rpc.core.serializer.impl;
+package com.jxin.rpc.core.util.serializer.impl;
 
 import com.jxin.rpc.core.consts.DataEnum;
-import com.jxin.rpc.core.serializer.Serializer;
+import com.jxin.rpc.core.util.serializer.Serializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;

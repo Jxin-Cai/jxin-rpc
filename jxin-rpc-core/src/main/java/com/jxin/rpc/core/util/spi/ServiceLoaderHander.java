@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.spi;
+package com.jxin.rpc.core.util.spi;
 
 import com.jxin.rpc.core.exc.ServiceLoaderExc;
 import com.jxin.rpc.core.inject.Singleton;

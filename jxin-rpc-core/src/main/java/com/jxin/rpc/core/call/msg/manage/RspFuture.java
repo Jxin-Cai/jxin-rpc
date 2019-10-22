@@ -1,6 +1,6 @@
-package com.jxin.rpc.core.netty.msg.manage;
+package com.jxin.rpc.core.call.msg.manage;
 
-import com.jxin.rpc.core.netty.msg.RspMsg;
+import com.jxin.rpc.core.call.msg.MsgContext;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,5 +20,5 @@ public class RspFuture {
     /**时间截*/
     private final long timestamp;
     /**Future类型的 响应消息实体*/
-    private final CompletableFuture<RspMsg> future;
+    private final CompletableFuture<MsgContext> future;
 }

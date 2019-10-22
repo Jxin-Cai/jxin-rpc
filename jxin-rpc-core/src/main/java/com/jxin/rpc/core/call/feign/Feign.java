@@ -1,7 +1,6 @@
-package com.jxin.rpc.core.netty.feign;
+package com.jxin.rpc.core.call.feign;
 
-import com.jxin.rpc.core.netty.msg.ReqMsg;
-import com.jxin.rpc.core.netty.msg.RspMsg;
+import com.jxin.rpc.core.call.msg.MsgContext;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -14,9 +13,9 @@ import java.util.concurrent.CompletableFuture;
 public interface Feign {
     /**
      * 发送请求命令
-     * @param  reqMsg 请求消息体
+     * @param  msg 请求消息体
      * @return Future类型的 响应消息实体
      * @author 蔡佳新
      */
-    CompletableFuture<RspMsg> send(ReqMsg reqMsg);
+    CompletableFuture<MsgContext> send(MsgContext msg);
 }

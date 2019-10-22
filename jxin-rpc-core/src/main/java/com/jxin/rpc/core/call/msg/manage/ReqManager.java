@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.netty.msg.manage;
+package com.jxin.rpc.core.call.msg.manage;
 
 import java.io.Closeable;
 import java.util.Map;
