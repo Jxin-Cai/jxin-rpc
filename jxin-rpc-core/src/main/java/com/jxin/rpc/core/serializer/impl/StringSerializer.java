@@ -1,6 +1,6 @@
 package com.jxin.rpc.core.serializer.impl;
 
-import com.jxin.rpc.core.serializer.DataEnum;
+import com.jxin.rpc.core.consts.DataEnum;
 import com.jxin.rpc.core.serializer.Serializer;
 import org.apache.commons.lang3.StringUtils;
 
