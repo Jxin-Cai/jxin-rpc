@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.spi;
+package com.jxin.rpc.core.exc;
 
 /**
  * SPI类加载异常类
