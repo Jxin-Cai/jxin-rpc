@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.serializer;
+package com.jxin.rpc.core.exc;
 
 /**
  * 序列化异常类
