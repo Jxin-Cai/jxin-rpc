@@ -44,6 +44,8 @@
         <com.itranswarp.compiler.version>1.0</com.itranswarp.compiler.version>
         <apache.commons.collections.version>4.3</apache.commons.collections.version>
         <apache.commons.lang.version>3.8.1</apache.commons.lang.version>
+        <!--protostuff 自定义序列化器-->
+        <protostuff.version>1.4.0</protostuff.version>
     </properties>
 
     <dependencyManagement>
@@ -62,6 +64,16 @@
                 <groupId>com.itranswarp</groupId>
                 <artifactId>compiler</artifactId>
                 <version>${com.itranswarp.compiler.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-core</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-runtime</artifactId>
+                <version>${protostuff.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

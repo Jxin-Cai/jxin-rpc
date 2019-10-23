@@ -1,6 +1,6 @@
 package com.jxin.rpc.core.call.feign.impl.netty;
 
-import com.jxin.rpc.core.call.feign.Feign;
+import com.jxin.rpc.core.call.feign.Sender;
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.manage.ReqManager;
 import com.jxin.rpc.core.call.msg.manage.RspFuture;
@@ -11,13 +11,13 @@ import lombok.Builder;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 基于netty的 发送消息接口 Fegin实现
+ * 基于netty的 消息发送器
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/22 17:24
  */
 @Builder
-public class NettyFeign implements Feign {
+public class NettySender implements Sender {
     /**连接*/
     private final Channel channel;
     /**请求管理器*/
@@ -27,7 +27,7 @@ public class NettyFeign implements Feign {
         // 构建返回值
         final CompletableFuture<MsgContext> msgContextFuture = new CompletableFuture<>();
         try {
-            // 将在途请求放到inFlightRequests中
+            // 将在途请求放到请求管理器中
             reqManager.put(RspFuture.builder()
                                     .requestId(msg.getHeader().getRequestId())
                                     .future(msgContextFuture)

@@ -1,6 +1,6 @@
 package com.jxin.rpc.core.util.serializer.impl;
 
-import com.jxin.rpc.core.consts.DataEnum;
+import com.jxin.rpc.core.consts.SerializerEnum;
 import com.jxin.rpc.core.util.serializer.Serializer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,11 +15,11 @@ import java.nio.charset.StandardCharsets;
 public class StringSerializer implements Serializer<String> {
 
     @Override
-    public void serialize(String entry, byte[] bytes, int offset, int length) {
-        if(StringUtils.isBlank(entry)){
+    public void serialize(String obj, byte[] bytes, int offset, int length) {
+        if(StringUtils.isBlank(obj)){
             return ;
         }
-         final byte [] dataBytes = entry.getBytes(StandardCharsets.UTF_8);
+         final byte [] dataBytes = obj.getBytes(StandardCharsets.UTF_8);
          System.arraycopy(dataBytes, 0, bytes, offset, dataBytes.length);
     }
 
@@ -29,17 +29,17 @@ public class StringSerializer implements Serializer<String> {
     }
 
     @Override
-    public Integer size(String entry) {
-        return entry.getBytes(StandardCharsets.UTF_8).length;
+    public Integer size(String obj) {
+        return obj.getBytes(StandardCharsets.UTF_8).length;
     }
 
     @Override
-    public DataEnum type() {
-        return DataEnum.STR;
+    public Integer getType() {
+        return SerializerEnum.STR.getType();
     }
 
     @Override
-    public Class<String> getSerializeClass() {
+    public Class<String> getObjectClass() {
         return String.class;
     }
 }

@@ -21,7 +21,7 @@ public class ReqHeader extends Header{
      */
     @Override
     public int length() {
-       /* requestId.size() + version.size() + type.size()*/
+       /* requestId.size() + version.size() + getType.size()*/
         return Integer.BYTES * 3;
     }
 }

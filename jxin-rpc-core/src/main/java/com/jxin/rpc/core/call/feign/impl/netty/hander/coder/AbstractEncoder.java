@@ -34,7 +34,7 @@ public abstract class AbstractEncoder extends MessageToByteEncoder {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         if(!(o instanceof MsgContext)) {
-            throw new RPCExc("Unknown msg type: %s!", o.getClass().getCanonicalName());
+            throw new RPCExc("Unknown msg getType: %s!", o.getClass().getCanonicalName());
         }
 
         final MsgContext msg = (MsgContext) o;

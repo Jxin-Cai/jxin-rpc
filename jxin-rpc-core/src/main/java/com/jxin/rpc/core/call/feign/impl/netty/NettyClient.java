@@ -1,7 +1,7 @@
 package com.jxin.rpc.core.call.feign.impl.netty;
 
-import com.jxin.rpc.core.call.feign.Feign;
-import com.jxin.rpc.core.call.feign.FeignClient;
+import com.jxin.rpc.core.call.feign.Sender;
+import com.jxin.rpc.core.call.feign.Client;
 import com.jxin.rpc.core.call.feign.impl.netty.hander.RspCompleteHander;
 import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.req.ReqEncoder;
 import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.rsp.RspDecoder;
@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 基于netty实现的 feign 客户端
+ * 基于netty实现的 客户端
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/22 17:53
  */
-public class NettyClient implements FeignClient {
+public class NettyClient implements Client {
     /**事件分组*/
     private EventLoopGroup eventGroup;
     /**netty启动器*/
@@ -45,12 +45,22 @@ public class NettyClient implements FeignClient {
     static {
         RSP_COMPLETE_HANDER = new RspCompleteHander(REQ_MANAGER);
     }
+    /**
+     * 生成发送消息的 消息发送器
+     * @param  address           套接字地址
+     * @param  connectionTimeout 连接超时时间
+     * @return 发送消息的 Fegin接口
+     * @throws InterruptedException  建立连接被中断
+     * @throws TimeoutException      建立连接超时
+     * @throws IllegalStateException 参数异常
+     * @author 蔡佳新
+     */
     @Override
-    public Feign createFeign(SocketAddress address, long connectionTimeout) throws InterruptedException, TimeoutException {
-        return NettyFeign.builder()
-                         .channel(createChannel(address, connectionTimeout))
-                         .reqManager(REQ_MANAGER)
-                         .build();
+    public Sender createSender(SocketAddress address, long connectionTimeout) throws InterruptedException, TimeoutException {
+        return NettySender.builder()
+                          .channel(createChannel(address, connectionTimeout))
+                          .reqManager(REQ_MANAGER)
+                          .build();
     }
 
     /**
@@ -63,9 +73,9 @@ public class NettyClient implements FeignClient {
      * @throws IllegalStateException 参数异常
      * @author 蔡佳新
      */
-    private synchronized Channel createChannel(SocketAddress address, long connectionTimeout) throws InterruptedException, TimeoutException, IllegalStateException {
+    private synchronized Channel createChannel(SocketAddress address, long connectionTimeout) throws InterruptedException, TimeoutException {
         if (address == null) {
-            throw new IllegalArgumentException("address must not be null!");
+            throw new IllegalArgumentException("non null address required!");
         }
         if (eventGroup == null) {
             eventGroup = createEventGroup();
@@ -103,7 +113,6 @@ public class NettyClient implements FeignClient {
      * 创建连接执行器
      * @return 连接执行器
      * @author 蔡佳新
-
      */
     private ChannelHandler createChannelHandler() {
         return new ChannelInitializer<Channel>() {

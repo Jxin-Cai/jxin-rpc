@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * SPI类加载器执行器
+ * SPI类加载器工具
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/21 20:25
  */
-public class ServiceLoaderHander {
+public class ServiceLoaderUtil {
     /**单例服务的容器*/
     private static final Map<String/*服务名*/, Object/*服务实现类*/> SINGLETON_SERVICE_MAP = new HashMap<>();
 
@@ -26,7 +26,7 @@ public class ServiceLoaderHander {
      */
     public static synchronized <T> T load(Class<T> service) {
         return StreamSupport.stream(ServiceLoader.load(service).spliterator(), false)
-                            .map(ServiceLoaderHander::singletonFilter)
+                            .map(ServiceLoaderUtil::singletonFilter)
                             .findFirst().orElseThrow(ServiceLoaderExc::new);
     }
     /**
@@ -38,7 +38,7 @@ public class ServiceLoaderHander {
      */
     public static synchronized <T> Collection<T> loadAll(Class<T> service) {
         return StreamSupport.stream(ServiceLoader.load(service).spliterator(), false)
-                            .map(ServiceLoaderHander::singletonFilter).collect(Collectors.toList());
+                            .map(ServiceLoaderUtil::singletonFilter).collect(Collectors.toList());
     }
     /**
      * 单例服务过滤器

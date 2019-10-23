@@ -30,6 +30,6 @@ public class RspEncoder extends AbstractEncoder {
             byteBuf.writeBytes(rspHeader.getErrMsg().getBytes(StandardCharsets.UTF_8));
             return;
         }
-        throw new CoderExc(String.format("Invalid header type: %s!", header.getClass().getCanonicalName()));
+        throw new CoderExc(String.format("Invalid header getType: %s!", header.getClass().getCanonicalName()));
     }
 }
