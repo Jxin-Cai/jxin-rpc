@@ -2,6 +2,7 @@ package com.jxin.rpc.core.call.feign.impl.netty;
 
 import com.jxin.rpc.core.call.feign.Feign;
 import com.jxin.rpc.core.call.feign.FeignClient;
+import com.jxin.rpc.core.call.feign.impl.netty.hander.RspCompleteHander;
 import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.req.ReqEncoder;
 import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.rsp.RspDecoder;
 import com.jxin.rpc.core.call.msg.manage.ReqManager;
@@ -31,14 +32,24 @@ public class NettyClient implements FeignClient {
     /**netty启动器*/
     private Bootstrap bootstrap;
     /**请求管理器*/
-    private final ReqManager reqManager = new ReqManager();
+    private static final ReqManager REQ_MANAGER = new ReqManager();
     /**连接列表*/
     private List<Channel> channels = new LinkedList<>();
+
+    /**响应消息完结执行器*/
+    private static final RspCompleteHander RSP_COMPLETE_HANDER;
+    /**响应反编译器*/
+    private static final RspDecoder RSP_DECODER = new RspDecoder();
+    /**请求编译器*/
+    private static final ReqEncoder REQ_ENCODER = new ReqEncoder();
+    static {
+        RSP_COMPLETE_HANDER = new RspCompleteHander(REQ_MANAGER);
+    }
     @Override
     public Feign createFeign(SocketAddress address, long connectionTimeout) throws InterruptedException, TimeoutException {
         return NettyFeign.builder()
                          .channel(createChannel(address, connectionTimeout))
-                         .reqManager(reqManager)
+                         .reqManager(REQ_MANAGER)
                          .build();
     }
 
@@ -99,9 +110,9 @@ public class NettyClient implements FeignClient {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
-                        .addLast(new RspDecoder())
-                        .addLast(new ReqEncoder())
-                        .addLast(new ResponseInvocation(inFlightRequests));
+                        .addLast(RSP_DECODER)
+                        .addLast(REQ_ENCODER)
+                        .addLast(RSP_COMPLETE_HANDER);
             }
         };
     }
@@ -129,6 +140,6 @@ public class NettyClient implements FeignClient {
         if (eventGroup != null) {
             eventGroup.shutdownGracefully();
         }
-        reqManager.close();
+        REQ_MANAGER.close();
     }
 }
