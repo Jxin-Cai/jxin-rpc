@@ -16,7 +16,9 @@ import java.util.HashMap;
  */
 
 public enum SerializerEnum {
+    /**字符串*/
     STR("字符串", 0, String.class),
+    /**请求消息*/
     REQ_MSG("请求消息", 1, ReqMsg.class),
     ;
 

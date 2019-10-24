@@ -16,7 +16,9 @@ import java.util.HashMap;
  */
 @AllArgsConstructor
 public enum ReqEnum {
+    /**客户端请求*/
     CLIENT_REQ("客户端请求", 0),
+    /**代理端请求*/
     AGENT_REQ("代理端请求", 1),
     ;
 

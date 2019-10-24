@@ -10,8 +10,11 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum RspStatusEnum {
+    /**响应请求成功*/
     RES_CODE_200("响应请求成功", 200),
+    /**服务生产者不存在*/
     RES_CODE_404("服务生产者不存在", 404),
+    /**服务生产者执行异常*/
     RES_CODE_500("服务生产者执行异常", 500),
 ;
 
