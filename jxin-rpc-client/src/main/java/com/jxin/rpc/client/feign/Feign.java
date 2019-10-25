@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.feign;
+package com.jxin.rpc.client.feign;
 
 /**
  * @author 蔡佳新

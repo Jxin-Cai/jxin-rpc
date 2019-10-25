@@ -1,8 +1,8 @@
-package com.jxin.rpc.core.consts;
+package com.jxin.rpc.server.consts;
 
 import com.google.common.collect.Maps;
-import com.jxin.rpc.core.call.msg.hander.ReqMsgHander;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
+import com.jxin.rpc.server.hander.ProviderHander;
 import lombok.AllArgsConstructor;
 
 import java.util.Collection;
@@ -15,11 +15,11 @@ import java.util.HashMap;
  * @since 2019/10/23 16:30
  */
 @AllArgsConstructor
-public enum ReqEnum {
-    /**客户端请求*/
-    CLIENT_REQ("客户端请求", 0),
-    /**代理端请求*/
-    AGENT_REQ("代理端请求", 1),
+public enum ProviderEnum {
+    /**代理端提供者*/
+    AGENT_PROVIDER("代理端提供者", 0),
+    /**服务端提供者*/
+    SERVER_PROVIDER("服务端提供者", 1),
     ;
 
     /**请求名称*/
@@ -27,14 +27,14 @@ public enum ReqEnum {
     /**请求类型*/
     private final Integer type;
 
-    /**根据type获取ReqMsgHander的map*/
-    private static final HashMap<Integer/*type*/, ReqMsgHander> TYPE_MAP = Maps.newHashMap();
+    /**根据type获取ProviderHander的map*/
+    private static final HashMap<Integer/*type*/, ProviderHander> TYPE_MAP = Maps.newHashMap();
 
     static {
-        // reqMsgHander init
-        final Collection<ReqMsgHander> reqMsgHanderList = ServiceLoaderUtil.loadAll(ReqMsgHander.class);
-        for (ReqMsgHander reqMsgHander : reqMsgHanderList) {
-            TYPE_MAP.put(reqMsgHander.type(), reqMsgHander);
+        // ProviderHander init
+        final Collection<ProviderHander> providerHanderList = ServiceLoaderUtil.loadAll(ProviderHander.class);
+        for (ProviderHander providerHander : providerHanderList) {
+            TYPE_MAP.put(providerHander.type(), providerHander);
         }
     }
 
@@ -44,7 +44,7 @@ public enum ReqEnum {
      * @return 消息处理器
      * @author 蔡佳新
      */
-    public static ReqMsgHander getByType(Integer type){
+    public static ProviderHander getByType(Integer type){
         return TYPE_MAP.get(type);
     }
 

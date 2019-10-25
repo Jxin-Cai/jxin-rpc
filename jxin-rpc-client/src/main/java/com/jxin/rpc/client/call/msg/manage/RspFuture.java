@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.call.msg.manage;
+package com.jxin.rpc.client.call.msg.manage;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 import lombok.Builder;

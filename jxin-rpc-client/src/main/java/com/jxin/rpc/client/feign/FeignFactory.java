@@ -1,6 +1,4 @@
-package com.jxin.rpc.core.feign;
-
-import com.jxin.rpc.core.call.Sender;
+package com.jxin.rpc.client.feign;
 
 /**
  * 桩(装)的工厂类

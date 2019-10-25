@@ -1,14 +1,14 @@
-package com.jxin.rpc.core.call.msg.hander;
+package com.jxin.rpc.server.hander;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 
 /**
- * 请求消息处理器
+ * 请求处理器
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/23 16:07
  */
-public interface ReqMsgHander {
+public interface ProviderHander {
     /**
      * 处理请求
      * @param  msg 消息

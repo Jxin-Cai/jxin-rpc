@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.call;
+package com.jxin.rpc.client.call;
 
 import java.io.Closeable;
 import java.net.SocketAddress;

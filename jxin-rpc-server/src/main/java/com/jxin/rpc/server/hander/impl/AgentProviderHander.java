@@ -1,18 +1,18 @@
-package com.jxin.rpc.core.call.msg.hander.impl;
+package com.jxin.rpc.server.hander.impl;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.call.msg.RspMsg;
-import com.jxin.rpc.core.call.msg.hander.ReqMsgHander;
 import com.jxin.rpc.core.call.msg.header.Header;
 import com.jxin.rpc.core.call.msg.header.RspHeader;
-import com.jxin.rpc.core.consts.ReqEnum;
+import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
 import com.jxin.rpc.core.consts.RspStatusEnum;
 import com.jxin.rpc.core.exc.RPCExc;
-import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
 import com.jxin.rpc.core.scan.ApplicationContext;
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import com.jxin.rpc.core.util.serializer.SerializeUtil;
+import com.jxin.rpc.server.consts.ProviderEnum;
+import com.jxin.rpc.server.hander.ProviderHander;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,13 +21,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * 代理端请求消息处理器
+ * 代理端请求处理器
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/23 16:39
  */
 @Slf4j
-public class AgentReqMsgHander implements ReqMsgHander {
+public class AgentProviderHander implements ProviderHander {
     /**空的字节码数组*/
     private static final byte[] EMPTY_BYTE_ARR = new byte[0];
     /**服务上下文*/
@@ -76,6 +76,10 @@ public class AgentReqMsgHander implements ReqMsgHander {
         if(returnObj instanceof Iterable){
             final Iterable returnIte= (Iterable)returnObj;
             final Class<?> clazz = returnIte.iterator().next().getClass();
+            final ReturnArgMark returnArgMark = ReturnArgMark.builder()
+                                                             .multi(true)
+                                                             .classMark(ArgMarkUtil.getMark(clazz))
+                                                             .build();
             return MsgContext.builder()
                              .header(RspHeader.builder()
                                               .type(type())
@@ -84,14 +88,15 @@ public class AgentReqMsgHander implements ReqMsgHander {
                                               .code(RspStatusEnum.RES_CODE_200.getCode())
                                               .build())
                             .body(SerializeUtil.serialize(RspMsg.builder()
-                                               .returnArgMark(ReturnArgMark.builder()
-                                                                           .multi(true)
-                                                                           .classMark(ArgMarkUtil.getMark(clazz))
-                                                                           .build())
+                                               .returnArgMark(returnArgMark)
                                                .returnArg(returnObj)
                                                .build()))
                             .build();
         }
+        final ReturnArgMark returnArgMark = ReturnArgMark.builder()
+                                                         .classMark(ArgMarkUtil.getMark(returnObj.getClass()))
+                                                         .multi(false)
+                                                         .build();
         return MsgContext.builder()
                          .header(RspHeader.builder()
                                           .type(type())
@@ -100,10 +105,7 @@ public class AgentReqMsgHander implements ReqMsgHander {
                                           .code(RspStatusEnum.RES_CODE_200.getCode())
                                           .build())
                         .body(SerializeUtil.serialize(RspMsg.builder()
-                                                            .returnArgMark(ReturnArgMark.builder()
-                                                                                        .classMark(ArgMarkUtil.getMark(returnObj.getClass()))
-                                                                                        .multi(false)
-                                                                                        .build())
+                                                            .returnArgMark(returnArgMark)
                                                             .returnArg(returnObj)
                                                             .build()))
                         .build();
@@ -137,7 +139,7 @@ public class AgentReqMsgHander implements ReqMsgHander {
 
     @Override
     public int type() {
-        return ReqEnum.CLIENT_REQ.getType();
+        return ProviderEnum.SERVER_PROVIDER.getType();
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {

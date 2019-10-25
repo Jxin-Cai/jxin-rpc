@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.feign.proxy;
+package com.jxin.rpc.client.proxy;
 
 import lombok.extern.slf4j.Slf4j;
 

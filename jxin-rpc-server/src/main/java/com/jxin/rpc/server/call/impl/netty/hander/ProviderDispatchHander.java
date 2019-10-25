@@ -1,9 +1,9 @@
-package com.jxin.rpc.core.call.impl.netty.hander;
+package com.jxin.rpc.server.call.impl.netty.hander;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
-import com.jxin.rpc.core.call.msg.hander.ReqMsgHander;
-import com.jxin.rpc.core.consts.ReqEnum;
 import com.jxin.rpc.core.exc.RPCExc;
+import com.jxin.rpc.server.consts.ProviderEnum;
+import com.jxin.rpc.server.hander.ProviderHander;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @ChannelHandler.Sharable
-public class ReqDispatcherHander extends SimpleChannelInboundHandler<MsgContext> {
+public class ProviderDispatchHander extends SimpleChannelInboundHandler<MsgContext> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MsgContext msg) throws RPCExc {
-        final ReqMsgHander reqMsgHander = ReqEnum.getByType(msg.getHeader().getType());
-        if(reqMsgHander == null) {
+        final ProviderHander providerHander = ProviderEnum.getByType(msg.getHeader().getType());
+        if(providerHander == null) {
             throw new RPCExc("No handler for request with type: %d!", msg.getHeader().getType());
         }
-        final MsgContext msgContext = reqMsgHander.handle(msg);
+        final MsgContext msgContext = providerHander.handle(msg);
         if(msgContext == null) {
             log.error("Response is null!");
         }

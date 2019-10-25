@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.feign.proxy;
+package com.jxin.rpc.client.proxy;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
