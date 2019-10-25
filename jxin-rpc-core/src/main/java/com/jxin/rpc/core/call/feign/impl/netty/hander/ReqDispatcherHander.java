@@ -3,6 +3,7 @@ package com.jxin.rpc.core.call.feign.impl.netty.hander;
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.hander.ReqMsgHander;
 import com.jxin.rpc.core.consts.ReqEnum;
+import com.jxin.rpc.core.exc.RPCExc;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @ChannelHandler.Sharable
 public class ReqDispatcherHander extends SimpleChannelInboundHandler<MsgContext> {
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MsgContext msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, MsgContext msg) throws RPCExc {
         final ReqMsgHander reqMsgHander = ReqEnum.getByType(msg.getHeader().getType());
         if(reqMsgHander == null) {
-            throw new Exception(String.format("No handler for request with type: %d!", msg.getHeader().getType()));
+            throw new RPCExc("No handler for request with type: %d!", msg.getHeader().getType());
         }
         final MsgContext msgContext = reqMsgHander.handle(msg);
         if(msgContext == null) {

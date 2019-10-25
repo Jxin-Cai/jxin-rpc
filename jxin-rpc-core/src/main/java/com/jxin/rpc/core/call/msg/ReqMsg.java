@@ -1,5 +1,6 @@
 package com.jxin.rpc.core.call.msg;
 
+import com.jxin.rpc.core.mark.MethodMark;
 import com.jxin.rpc.core.mark.ServerMark;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,8 @@ import lombok.Data;
 public class ReqMsg {
     /**服务标示*/
     private ServerMark serverMark;
+    /**方法标识*/
+    private final MethodMark methodMark;
     /**参数列表*/
     private Object[] argArr;
 }

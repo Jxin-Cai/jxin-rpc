@@ -83,27 +83,28 @@ public class ProtoStuffUtil {
 
     /**
      * 序列化对象列表
-     * @param  objList 要序列化的对象列表
-     * @param  <T>     对象类型
+     * @param  obj   要序列化的对象列表
+     * @param  clazz 字节码类型
+     * @param  <T>   对象类型
      * @throws SerializeExc  序列化失败时
      * @return 序列化后的字节数组
      * @author 蔡佳新
      */
     @SuppressWarnings("unchecked")
-    public static <T> byte[] serializeList(@NotEmpty List<T> objList) {
-        if (CollectionUtils.isEmpty(objList)) {
-            throw new IllegalArgumentException("non empty objList required");
+    public static <T> byte[] serializeList(@NotEmpty Object obj, @NotNull Class<T> clazz) {
+        if (obj == null) {
+            throw new IllegalArgumentException("non null obj required");
         }
         final LinkedBuffer buffer = LinkedBuffer.allocate(LINKED_BUFFER_DEF_SIZE);
         byte[] result;
         try(final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ProtostuffIOUtil.writeListTo(bos,
-                                         objList,
-                                         (Schema<T>) RuntimeSchema.getSchema(objList.get(0).getClass()),
+                                         (List<T>)obj,
+                                         RuntimeSchema.getSchema(clazz),
                                          buffer);
             result = bos.toByteArray();
         } catch (Exception e) {
-            throw new SerializeExc(e, "多对象序列化失败, obj:{}", GsonUtil.GsonToStr(objList));
+            throw new SerializeExc(e, "多对象序列化失败, obj:{}", GsonUtil.GsonToStr(obj));
         }finally {
             buffer.clear();
         }

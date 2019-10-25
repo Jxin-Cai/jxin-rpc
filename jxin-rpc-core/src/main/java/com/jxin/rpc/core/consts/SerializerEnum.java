@@ -2,6 +2,7 @@ package com.jxin.rpc.core.consts;
 
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.call.msg.ReqMsg;
+import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.util.serializer.Serializer;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 
@@ -20,6 +21,10 @@ public enum SerializerEnum {
     STR("字符串", 0, String.class),
     /**请求消息*/
     REQ_MSG("请求消息", 1, ReqMsg.class),
+    /**返回消息*/
+    RSP_MSG("返回消息", 2, RspMsg.class),
+    /**服务标识*/
+    SERVER_MARK("服务标示", 3, RspMsg.class),
     ;
 
     /**序列化器名称*/

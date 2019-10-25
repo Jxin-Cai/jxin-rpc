@@ -10,6 +10,9 @@ public class RPCExc extends RuntimeException{
     public RPCExc(String messageTemplate, Object... params){
         super(String.format(messageTemplate, params));
     }
+    public RPCExc(String message){
+        super(message);
+    }
     public RPCExc(){
         super();
     }

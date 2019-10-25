@@ -1,9 +1,8 @@
 package com.jxin.rpc.core.util.serializer;
 
+import com.google.common.collect.HashBiMap;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 参数标示工具
@@ -14,7 +13,7 @@ import java.util.Map;
 @Slf4j
 public class ArgMarkUtil {
     /**基础类的标示*/
-    private static final Map<String/*类的标识符*/, Class<?>> BASE_MARK_MAP = new HashMap<>(8);
+    private static final HashBiMap<String/*类的标识符*/, Class<?>> BASE_MARK_MAP = HashBiMap.create();
     static {
         BASE_MARK_MAP.put("B", byte.class);
         BASE_MARK_MAP.put("C", char.class);
@@ -24,6 +23,10 @@ public class ArgMarkUtil {
         BASE_MARK_MAP.put("J", long.class);
         BASE_MARK_MAP.put("S", short.class);
         BASE_MARK_MAP.put("Z", boolean.class);
+    }
+
+    public ArgMarkUtil() {
+        super();
     }
 
     /**
@@ -43,5 +46,18 @@ public class ArgMarkUtil {
            log.error(e.getMessage(), e);
         }
         return null;
+    }
+    /**
+     * 根据类的字节码对象获取 标示
+     * @param  clazz 类的字节码对象
+     * @return 标示
+     * @author 蔡佳新
+     */
+    public static String getMark(Class<?> clazz){
+        final String mark = BASE_MARK_MAP.inverse().get(clazz);
+        if(StringUtils.isNotBlank(mark)){
+            return mark;
+        }
+        return clazz.getName();
     }
 }

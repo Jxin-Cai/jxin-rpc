@@ -3,6 +3,7 @@ package com.jxin.rpc.core.util.serializer.impl;
 import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.consts.SerializerEnum;
 import com.jxin.rpc.core.exc.SerializeExc;
+import com.jxin.rpc.core.mark.MethodMark;
 import com.jxin.rpc.core.mark.ServerMark;
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import com.jxin.rpc.core.util.serializer.ProtoStuffUtil;
@@ -22,9 +23,15 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
     @Override
     public void serialize(ReqMsg obj, byte[] bytes, int offset, int length) {
         final ByteBuffer buffer = ByteBuffer.wrap(bytes, offset, length);
+        // serverMark
         final byte[] serverMarkByteArr = ProtoStuffUtil.serialize(obj.getServerMark());
         buffer.putInt(serverMarkByteArr.length);
         buffer.put(serverMarkByteArr);
+        // methodMark
+        final byte[] methodMarkByteArr = ProtoStuffUtil.serialize(obj.getMethodMark());
+        buffer.putInt(methodMarkByteArr.length);
+        buffer.put(methodMarkByteArr);
+        // ArgArr
         if(ArrayUtils.isEmpty(obj.getArgArr())){
             return;
         }
@@ -38,6 +45,7 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
     @Override
     public ReqMsg deserialize(byte[] bytes, int offset, int length) {
         final ByteBuffer buffer = ByteBuffer.wrap(bytes, offset, length);
+        // serverMark
         final int serverMarkLen = buffer.getInt();
         final byte [] serverMarkByteArr = new byte[serverMarkLen];
         buffer.get(serverMarkByteArr);
@@ -46,8 +54,17 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
         if(serverMark == null){
             throw new SerializeExc("non null serverMark");
         }
+        // methodMark
+        final int methodMarkLen = buffer.getInt();
+        final byte [] methodMarkByteArr = new byte[methodMarkLen];
+        buffer.get(methodMarkByteArr);
+        final MethodMark methodMark = ProtoStuffUtil.deserialize(methodMarkByteArr, MethodMark.class);
 
-        final String argMarkArrStr = serverMark.getArgMarkArrStr();
+        if(methodMark == null){
+            throw new SerializeExc("non null methodMark");
+        }
+        // argArr
+        final String argMarkArrStr = methodMark.getArgMarkArrStr();
         if(StringUtils.isBlank(argMarkArrStr)){
             return ReqMsg.builder().serverMark(serverMark).build();
         }
@@ -66,6 +83,7 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
 
         return ReqMsg.builder()
                      .serverMark(serverMark)
+                     .methodMark(methodMark)
                      .argArr(argArr)
                      .build();
     }
