@@ -22,8 +22,7 @@ public class RspEncoder extends AbstractEncoder {
         if(header instanceof RspHeader) {
             final RspHeader rspHeader = (RspHeader) header;
             byteBuf.writeInt(rspHeader.getCode());
-            int errMsgLength = header.length() - (Integer.BYTES * 5);
-            byteBuf.writeInt(errMsgLength);
+            byteBuf.writeInt(rspHeader.getErrMsgLen());
             if(StringUtils.isBlank(rspHeader.getErrMsg())){
                 return;
             }

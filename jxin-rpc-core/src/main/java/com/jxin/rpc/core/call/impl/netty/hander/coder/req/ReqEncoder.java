@@ -11,7 +11,7 @@ import io.netty.buffer.ByteBuf;
  * @version 1.0
  * @since 2019/10/22 21:39
  */
-public class ReqEncoder  extends AbstractEncoder {
+public class ReqEncoder extends AbstractEncoder {
     @Override
     protected void encodeHeader(Header header, ByteBuf byteBuf) throws CoderExc {
         encodeHeader(header, byteBuf);

@@ -7,6 +7,9 @@ import com.jxin.rpc.core.exc.RPCExc;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.apache.commons.lang3.StringUtils;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 抽象编译器
@@ -50,6 +53,7 @@ public abstract class AbstractEncoder extends MessageToByteEncoder {
     protected void encodeHeader(Header header, ByteBuf byteBuf) throws CoderExc{
         byteBuf.writeInt(header.getType());
         byteBuf.writeInt(header.getVersion());
-        byteBuf.writeInt(header.getRequestId());
+        byteBuf.writeInt(header.getRequestIdLen());
+        byteBuf.writeBytes(header.getRequestId().getBytes(StandardCharsets.UTF_8));
     }
 }

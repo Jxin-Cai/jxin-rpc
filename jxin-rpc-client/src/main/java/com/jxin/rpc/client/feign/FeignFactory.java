@@ -1,5 +1,7 @@
 package com.jxin.rpc.client.feign;
 
+import com.jxin.rpc.client.call.Sender;
+
 /**
  * 桩(装)的工厂类
  * @author 蔡佳新

@@ -13,6 +13,9 @@ public class RPCExc extends RuntimeException{
     public RPCExc(String message){
         super(message);
     }
+    public RPCExc(Throwable e){
+        super(e);
+    }
     public RPCExc(){
         super();
     }

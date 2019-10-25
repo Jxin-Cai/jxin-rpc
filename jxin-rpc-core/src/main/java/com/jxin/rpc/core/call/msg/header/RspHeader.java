@@ -19,7 +19,7 @@ public class RspHeader extends Header{
     /**异常消息*/
     private final String errMsg;
     @Builder
-    public RspHeader(int requestId,
+    public RspHeader(String requestId,
                      Integer version,
                      Integer type,
                      Integer code,
@@ -36,7 +36,18 @@ public class RspHeader extends Header{
     @Override
     public int length() {
         /* (requestId.size() + version.size() + getType.size() + code.size() + msg.length.size()) + msg.size()*/
-        return (Integer.BYTES * 5)
-               + (StringUtils.isBlank(errMsg) ? 0 : errMsg.getBytes(StandardCharsets.UTF_8).length);
+        return super.length()
+               + Integer.BYTES
+               + Integer.BYTES
+               + getErrMsgLen();
+    }
+
+    /**
+     * 获得异常消息的长度
+     * @return 异常消息的长度
+     * @author 蔡佳新
+     */
+    public int getErrMsgLen(){
+        return StringUtils.isBlank(errMsg) ? 0 : errMsg.getBytes(StandardCharsets.UTF_8).length;
     }
 }

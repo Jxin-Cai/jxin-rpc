@@ -19,12 +19,27 @@ public class RspDecoder extends AbstractDecoder {
     protected Header decodeHeader(ByteBuf byteBuf) {
         final int type = byteBuf.readInt();
         final int version = byteBuf.readInt();
-        final int requestId = byteBuf.readInt();
+
+        final int requestIdLen = byteBuf.readInt();
+        final byte [] requestByteArr = new byte[requestIdLen];
+        byteBuf.readBytes(requestByteArr);
+        final String requestId = new String(requestByteArr, StandardCharsets.UTF_8);
+
         final int code = byteBuf.readInt();
+
         final int errMsgLength = byteBuf.readInt();
+        if(errMsgLength <= 0){
+            return RspHeader.builder()
+                            .type(type)
+                            .version(version)
+                            .requestId(requestId)
+                            .code(code)
+                            .build();
+        }
         final byte [] errMsgBytes = new byte[errMsgLength];
         byteBuf.readBytes(errMsgBytes);
         final String errMsg = new String(errMsgBytes, StandardCharsets.UTF_8);
+
         return RspHeader.builder()
                         .type(type)
                         .version(version)
