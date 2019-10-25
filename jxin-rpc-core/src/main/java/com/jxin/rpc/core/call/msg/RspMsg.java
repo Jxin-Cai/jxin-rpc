@@ -1,6 +1,6 @@
 package com.jxin.rpc.core.call.msg;
 
-import com.jxin.rpc.core.mark.ReturnArgMark;
+import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
 import lombok.Builder;
 import lombok.Data;
 

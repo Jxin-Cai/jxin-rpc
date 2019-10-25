@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.mark;
+package com.jxin.rpc.core.call.msg.mark;
 
 import lombok.Builder;
 import lombok.Data;

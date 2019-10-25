@@ -16,6 +16,7 @@
         <module>jxin-rpc-demo</module>
     </modules>
     <properties>
+        <version>1.0-SNAPSHOT</version>
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- maven properties -->

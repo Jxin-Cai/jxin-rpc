@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.inject.RegistService;
 import com.jxin.rpc.core.inject.Service;
-import com.jxin.rpc.core.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;

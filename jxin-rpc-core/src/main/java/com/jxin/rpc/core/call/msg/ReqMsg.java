@@ -1,7 +1,7 @@
 package com.jxin.rpc.core.call.msg;
 
-import com.jxin.rpc.core.mark.MethodMark;
-import com.jxin.rpc.core.mark.ServerMark;
+import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import lombok.Builder;
 import lombok.Data;
 
