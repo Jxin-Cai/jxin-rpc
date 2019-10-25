@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.call.feign.impl.netty.hander;
+package com.jxin.rpc.core.call.impl.netty.hander;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.hander.ReqMsgHander;

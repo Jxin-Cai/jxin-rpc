@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.call.feign;
+package com.jxin.rpc.core.call;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 

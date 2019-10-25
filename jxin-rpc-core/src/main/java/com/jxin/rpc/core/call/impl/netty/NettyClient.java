@@ -1,10 +1,10 @@
-package com.jxin.rpc.core.call.feign.impl.netty;
+package com.jxin.rpc.core.call.impl.netty;
 
-import com.jxin.rpc.core.call.feign.Sender;
-import com.jxin.rpc.core.call.feign.Client;
-import com.jxin.rpc.core.call.feign.impl.netty.hander.RspCompleteHander;
-import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.req.ReqEncoder;
-import com.jxin.rpc.core.call.feign.impl.netty.hander.coder.rsp.RspDecoder;
+import com.jxin.rpc.core.call.Sender;
+import com.jxin.rpc.core.call.Client;
+import com.jxin.rpc.core.call.impl.netty.hander.RspCompleteHander;
+import com.jxin.rpc.core.call.impl.netty.hander.coder.req.ReqEncoder;
+import com.jxin.rpc.core.call.impl.netty.hander.coder.rsp.RspDecoder;
 import com.jxin.rpc.core.call.msg.manage.ReqManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;

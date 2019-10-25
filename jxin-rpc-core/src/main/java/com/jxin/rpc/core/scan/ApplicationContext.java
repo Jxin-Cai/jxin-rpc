@@ -28,7 +28,7 @@ import java.util.Map;
 @Slf4j
 public class ApplicationContext {
     /**全部服务上下文*/
-    private Map<String/*interfaceName*/, List<Object>/*serviceImplList*/> serviceContext = Maps.newHashMap();
+    private Map<String/*serviceName*/, List<Object>/*serviceImplList*/> serviceContext = Maps.newHashMap();
     /**注册服务上下文*/
     private Map<String/*interfaceName*/, List<Object>/*serviceImplList*/> registServiceContext = Maps.newHashMap();
     /**注册服务方法上下文*/
@@ -81,6 +81,9 @@ public class ApplicationContext {
             // 保留后缀.class 的文件
             return file.getName().endsWith(".class");
         });
+        if(ArrayUtils.isEmpty(fs)){
+            return;
+        }
         Arrays.stream(fs).map(file ->{
             // 去除.class以后的文件名
             final int cutPoint = file.getName().lastIndexOf('.');
@@ -94,7 +97,7 @@ public class ApplicationContext {
                 log.error(e.getMessage(), e);
                 return null;
             }
-        }).filter(obj ->!withoutPut(obj))
+        }).filter(obj -> !withoutPut(obj))
           .forEach(this::putService);
     }
     /**
@@ -103,14 +106,14 @@ public class ApplicationContext {
      * @author 蔡佳新
      */
     public void putService(Object obj) {
-        final Class<?>[] interfaceClassList = obj.getClass().getInterfaces();
-        for (Class<?> interfaceClass : interfaceClassList) {
+        final Class<?> clazz = obj.getClass();
+        for (Class<?> interfaceClass : clazz.getInterfaces()) {
             final AnnotatedType[] annotatedInterfaces = interfaceClass.getAnnotatedInterfaces();
             if(Arrays.stream(annotatedInterfaces).anyMatch(this::isRegistService)){
                 putServiceContext(obj, interfaceClass.getName(), registServiceContext);
             }
-            putServiceContext(obj, interfaceClass.getName(), serviceContext);
         }
+        putServiceContext(obj, clazz.getCanonicalName(), serviceContext);
     }
 
     /**
@@ -125,15 +128,15 @@ public class ApplicationContext {
 
     /**
      * 往注册服务上下文添加服务实现类
-     * @param  obj            服务实现类
-     * @param  interfaceName  接口名
+     * @param  obj          服务实现类
+     * @param  serviceName  服务名
      * @param  context 上下文
      * @author 蔡佳新
      */
-    private void putServiceContext(Object obj, String interfaceName, Map<String, List<Object>> context) {
-        final List<Object> beanList = context.get(interfaceName);
+    private void putServiceContext(Object obj, String serviceName, Map<String, List<Object>> context) {
+        final List<Object> beanList = context.get(serviceName);
         if(CollectionUtils.isEmpty(beanList)){
-            context.put(interfaceName, Lists.newArrayList(obj));
+            context.put(serviceName, Lists.newArrayList(obj));
             return;
         }
         beanList.add(obj);
@@ -224,5 +227,4 @@ public class ApplicationContext {
                          .argMarkArrStr(argMarkArrStr.toString())
                          .build();
     }
-
 }

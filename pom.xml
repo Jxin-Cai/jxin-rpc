@@ -31,7 +31,9 @@
         <maven-compiler-plugin.compilerArgument>-parameters</maven-compiler-plugin.compilerArgument>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
 
-
+        <!--动代-->
+        <cglib.version>3.3.0</cglib.version>
+        <javassist.version>3.21.0-GA</javassist.version>
         <!--logging-->
         <log4j.version>2.9.0</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -75,6 +77,16 @@
                 <groupId>io.protostuff</groupId>
                 <artifactId>protostuff-runtime</artifactId>
                 <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

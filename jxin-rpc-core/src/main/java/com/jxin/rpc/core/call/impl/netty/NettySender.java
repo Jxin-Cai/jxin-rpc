@@ -1,6 +1,6 @@
-package com.jxin.rpc.core.call.feign.impl.netty;
+package com.jxin.rpc.core.call.impl.netty;
 
-import com.jxin.rpc.core.call.feign.Sender;
+import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.manage.ReqManager;
 import com.jxin.rpc.core.call.msg.manage.RspFuture;
