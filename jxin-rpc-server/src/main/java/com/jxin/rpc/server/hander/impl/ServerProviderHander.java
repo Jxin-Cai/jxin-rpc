@@ -21,13 +21,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * 代理端请求处理器
+ * 服务端提供者执行器
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/23 16:39
  */
 @Slf4j
-public class AgentProviderHander implements ProviderHander {
+public class ServerProviderHander implements ProviderHander {
     /**空的字节码数组*/
     private static final byte[] EMPTY_BYTE_ARR = new byte[0];
     /**服务上下文*/
