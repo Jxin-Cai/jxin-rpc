@@ -2,7 +2,7 @@ package com.jxin.rpc.server.call.impl.netty.hander;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.exc.RPCExc;
-import com.jxin.rpc.server.consts.ProviderEnum;
+import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.server.hander.ProviderHander;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ProviderDispatchHander extends SimpleChannelInboundHandler<MsgContext> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MsgContext msg) throws RPCExc {
-        final ProviderHander providerHander = ProviderEnum.getByType(msg.getHeader().getType());
+        final ProviderHander providerHander = ProviderEnum.getByType(msg.getHeader().getProviderType());
         if(providerHander == null) {
-            throw new RPCExc("No handler for request with type: %d!", msg.getHeader().getType());
+            throw new RPCExc("No handler for request with type: %d!", msg.getHeader().getProviderType());
         }
         final MsgContext msgContext = providerHander.handle(msg);
         if(msgContext == null) {

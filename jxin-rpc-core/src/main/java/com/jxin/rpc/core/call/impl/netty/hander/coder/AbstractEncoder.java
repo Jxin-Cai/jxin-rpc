@@ -7,7 +7,6 @@ import com.jxin.rpc.core.exc.RPCExc;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -37,7 +36,7 @@ public abstract class AbstractEncoder extends MessageToByteEncoder {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         if(!(o instanceof MsgContext)) {
-            throw new RPCExc("Unknown msg getType: %s!", o.getClass().getCanonicalName());
+            throw new RPCExc("Unknown msg getProviderType: %s!", o.getClass().getCanonicalName());
         }
 
         final MsgContext msg = (MsgContext) o;
@@ -51,7 +50,7 @@ public abstract class AbstractEncoder extends MessageToByteEncoder {
      * @author 蔡佳新
      */
     protected void encodeHeader(Header header, ByteBuf byteBuf) throws CoderExc{
-        byteBuf.writeInt(header.getType());
+        byteBuf.writeInt(header.getProviderType());
         byteBuf.writeInt(header.getVersion());
         byteBuf.writeInt(header.getRequestIdLen());
         byteBuf.writeBytes(header.getRequestId().getBytes(StandardCharsets.UTF_8));

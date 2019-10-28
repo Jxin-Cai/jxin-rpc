@@ -39,8 +39,18 @@ public class SerializeUtil {
      * @return 反序列化出的对象
      * @author 蔡佳新
      */
-    public static <T> T parse(byte [] buffer) {
+    public static <T> T parse(byte[] buffer) {
         return parse(buffer, 0, buffer.length);
+    }
+    /**
+     * 指定获取的类型,反序列化二进制数组
+     * @param  buffer 二进制数组
+     * @param  <T>    对象的类型
+     * @return 反序列化出的对象
+     * @author 蔡佳新
+     */
+    public static <T> T parse(byte[] buffer, Class<T> clazz) {
+        return parse(buffer, 1, buffer.length - 1, clazz);
     }
     /**
      * 一)
@@ -59,7 +69,7 @@ public class SerializeUtil {
         final Byte type = buffer[0];
         final Class<?> clazz = SerializerEnum.getByType(type.intValue());
         if(clazz == null) {
-            throw new SerializeExc(String.format("non null clazz, type: %d!", type));
+            throw new SerializeExc("non null clazz, type: %d!", type);
         }
         return parse(buffer, offset + 1, length - 1, (Class<T>) clazz);
     }
@@ -77,7 +87,11 @@ public class SerializeUtil {
      */
     @SuppressWarnings("unchecked")
     private static <T> T parse(byte[] buffer, int offset, int length, Class<T> clazz) {
-        final T obj = SerializerEnum.getByClazz(clazz).deserialize(buffer, offset, length);
+        final Serializer<T> serializer = SerializerEnum.getByClazz(clazz);
+        if(serializer == null){
+            throw new SerializeExc("non null clazz, clazz: %d!", clazz.getCanonicalName());
+        }
+        final T obj = serializer.deserialize(buffer, offset, length);
         if (clazz.isAssignableFrom(obj.getClass())) {
             return obj;
         } else {

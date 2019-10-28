@@ -6,6 +6,7 @@ import com.jxin.rpc.client.call.impl.netty.hander.RspCompleteHander;
 import com.jxin.rpc.client.call.msg.manage.ReqManager;
 import com.jxin.rpc.core.call.impl.netty.hander.coder.req.ReqEncoder;
 import com.jxin.rpc.core.call.impl.netty.hander.coder.rsp.RspDecoder;
+import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -32,7 +33,7 @@ public class NettyClient implements Client {
     /**netty启动器*/
     private Bootstrap bootstrap;
     /**请求管理器*/
-    private static final ReqManager REQ_MANAGER = new ReqManager();
+    private static final ReqManager REQ_MANAGER;
     /**连接列表*/
     private List<Channel> channels = new LinkedList<>();
 
@@ -43,6 +44,7 @@ public class NettyClient implements Client {
     /**请求编译器*/
     private static final ReqEncoder REQ_ENCODER = new ReqEncoder();
     static {
+        REQ_MANAGER = ServiceLoaderUtil.load(ReqManager.class);
         RSP_COMPLETE_HANDER = new RspCompleteHander(REQ_MANAGER);
     }
     /**
@@ -149,6 +151,6 @@ public class NettyClient implements Client {
         if (eventGroup != null) {
             eventGroup.shutdownGracefully();
         }
-        REQ_MANAGER.close();
+        REQ_MANAGER.closeAll();
     }
 }

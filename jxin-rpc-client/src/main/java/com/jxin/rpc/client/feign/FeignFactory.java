@@ -1,6 +1,7 @@
 package com.jxin.rpc.client.feign;
 
 import com.jxin.rpc.client.call.Sender;
+import com.jxin.rpc.core.call.msg.mark.ServerMark;
 
 /**
  * 桩(装)的工厂类
@@ -9,5 +10,13 @@ import com.jxin.rpc.client.call.Sender;
  * @since jdk 1.8
  */
 public interface FeignFactory {
-    <T> T createFeign(Sender sender, T insterface);
+    /**
+     * 生成接口的feign客户端
+     * @param  sender     消息发送器
+     * @param  insterface 接口字节码对象
+     * @param  serverMark 服务标识
+     * @param  <T>        接口类的泛型
+     * @return feign客户端
+     */
+    <T> T createFeign(Sender sender, Class<T> insterface, ServerMark serverMark);
 }

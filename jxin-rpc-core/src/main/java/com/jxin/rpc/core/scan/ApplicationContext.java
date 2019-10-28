@@ -2,10 +2,9 @@ package com.jxin.rpc.core.scan;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import com.jxin.rpc.core.inject.RegistService;
 import com.jxin.rpc.core.inject.Service;
-import com.jxin.rpc.core.call.msg.mark.MethodMark;
-import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -219,12 +218,10 @@ public class ApplicationContext {
                              .methodName(methodName)
                              .build();
         }
-        final StringBuilder argMarkArrStr = new StringBuilder(ArgMarkUtil.getMark(paramClassArr[0]));
-        Arrays.stream(paramClassArr, 1, paramClassArr.length -1)
-              .forEach(clazz -> argMarkArrStr.append(",").append(ArgMarkUtil.getMark(clazz)));
         return MethodMark.builder()
                          .methodName(methodName)
-                         .argMarkArrStr(argMarkArrStr.toString())
+                         .argMarkArrStr(MethodMark.joinArgMarkArrToString(paramClassArr))
                          .build();
     }
+
 }

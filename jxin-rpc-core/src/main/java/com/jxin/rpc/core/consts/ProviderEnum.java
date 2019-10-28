@@ -1,4 +1,4 @@
-package com.jxin.rpc.server.consts;
+package com.jxin.rpc.core.consts;
 
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 /**
- * 请求类型枚举类
+ * 服务提供者枚举类
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/23 16:30

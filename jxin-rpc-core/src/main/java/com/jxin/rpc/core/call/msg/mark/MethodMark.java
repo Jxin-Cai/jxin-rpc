@@ -1,8 +1,10 @@
 package com.jxin.rpc.core.call.msg.mark;
 
+import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -31,5 +33,17 @@ public class MethodMark {
     @Override
     public int hashCode() {
         return Objects.hash(methodName, argMarkArrStr);
+    }
+
+    /**
+     * 逗号拼接的参数类型标示字符串
+     * @param  paramClassArr 参数蕾西数组
+     * @return 逗号拼接参数类型数组的标示
+     * @author 蔡佳新
+     */
+    public static String joinArgMarkArrToString(Class<?>[] paramClassArr) {
+        return String.join(",", Arrays.stream(paramClassArr)
+                                                .map(ArgMarkUtil::getMark)
+                                                .toArray(String[]::new));
     }
 }

@@ -73,7 +73,7 @@ public class RspMsgSerializer implements Serializer<RspMsg> {
 
     @Override
     public Integer getType() {
-        return SerializerEnum.REQ_MSG.getType();
+        return SerializerEnum.RSP_MSG.getType();
     }
 
     @Override

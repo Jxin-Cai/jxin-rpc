@@ -18,8 +18,8 @@ public class Header {
     private final String requestId;
     /**协议版本*/
     private final Integer version;
-    /**请求类型*/
-    private final Integer type;
+    /**提供者类型*/
+    private final Integer providerType;
 
     /**
      * 获取当前实体bean属性值所占空间之和
@@ -27,7 +27,7 @@ public class Header {
      * @author 蔡佳新
      */
     public int length() {
-        /* version.size() + getType.size() + requestId.length + requestId.size()*/
+        /* version.size() + getProviderType.size() + requestId.length + requestId.size()*/
         return Integer.BYTES * 3 + getRequestIdLen();
     }
 

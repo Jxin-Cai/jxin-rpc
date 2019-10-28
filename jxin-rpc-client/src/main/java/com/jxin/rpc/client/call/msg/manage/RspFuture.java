@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 @Builder
 public class RspFuture {
     /**请求id*/
-    private final int requestId;
+    private final String requestId;
     /**时间截*/
     private final long timestamp;
     /**Future类型的 响应消息实体*/

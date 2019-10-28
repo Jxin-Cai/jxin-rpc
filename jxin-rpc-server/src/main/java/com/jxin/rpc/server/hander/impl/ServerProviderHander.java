@@ -11,7 +11,7 @@ import com.jxin.rpc.core.exc.RPCExc;
 import com.jxin.rpc.core.scan.ApplicationContext;
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import com.jxin.rpc.core.util.serializer.SerializeUtil;
-import com.jxin.rpc.server.consts.ProviderEnum;
+import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.server.hander.ProviderHander;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;

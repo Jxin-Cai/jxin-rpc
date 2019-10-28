@@ -35,7 +35,7 @@ public class RspHeader extends Header{
      */
     @Override
     public int length() {
-        /* (requestId.size() + version.size() + getType.size() + code.size() + msg.length.size()) + msg.size()*/
+        /* (requestId.size() + version.size() + getProviderType.size() + code.size() + msg.length.size()) + msg.size()*/
         return super.length()
                + Integer.BYTES
                + Integer.BYTES
