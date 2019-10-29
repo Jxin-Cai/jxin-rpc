@@ -6,19 +6,18 @@ import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.call.msg.header.Header;
 import com.jxin.rpc.core.call.msg.header.RspHeader;
 import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
+import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.core.consts.RspStatusEnum;
 import com.jxin.rpc.core.exc.RPCExc;
 import com.jxin.rpc.core.scan.ApplicationContext;
+import com.jxin.rpc.core.scan.ApplicationContextSub;
+import com.jxin.rpc.core.server.hander.ProviderHander;
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
 import com.jxin.rpc.core.util.serializer.SerializeUtil;
-import com.jxin.rpc.core.consts.ProviderEnum;
-import com.jxin.rpc.core.server.hander.ProviderHander;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * 服务端提供者执行器
@@ -27,7 +26,7 @@ import java.util.List;
  * @since 2019/10/23 16:39
  */
 @Slf4j
-public class ServerProviderHander implements ProviderHander {
+public class ServerProviderHander implements ProviderHander, ApplicationContextSub {
     /**空的字节码数组*/
     private static final byte[] EMPTY_BYTE_ARR = new byte[0];
     /**服务上下文*/
@@ -38,16 +37,14 @@ public class ServerProviderHander implements ProviderHander {
         // 从body中反序列化出reqMsg
         final ReqMsg reqMsg = SerializeUtil.parse(msg.getBody());
         try {
-            final List<Object> serviceList = applicationContext.getRegistServiceList(reqMsg.getServerMark().getInterfaceName());
-            if(CollectionUtils.isEmpty(serviceList)){
+            final Object service = applicationContext.getRegistServiceList(reqMsg.getServerMark().getInterfaceName());
+            if(service == null){
                 throw new RPCExc("non empty serviceList ");
             }
 
-            // TODO 只取第一个实现类,后期有时间再调整
-            final Object obj = serviceList.get(0);
-            final Method method = applicationContext.getRegistMethod(obj)
+            final Method method = applicationContext.getRegistMethod(reqMsg.getServerMark().getInterfaceName())
                                                     .get(reqMsg.getMethodMark());
-            final Object returnObj = method.invoke(obj, reqMsg.getArgArr());
+            final Object returnObj = method.invoke(service, reqMsg.getArgArr());
             return createMsgContext(header, returnObj);
         } catch (Exception e) {
             // 发生异常，返回UNKNOWN_ERROR错误响应。
@@ -141,7 +138,7 @@ public class ServerProviderHander implements ProviderHander {
     public int type() {
         return ProviderEnum.SERVER_PROVIDER.getType();
     }
-
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

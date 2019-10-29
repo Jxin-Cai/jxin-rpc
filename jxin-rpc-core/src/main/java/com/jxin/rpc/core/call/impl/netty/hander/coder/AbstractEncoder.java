@@ -20,18 +20,19 @@ public abstract class AbstractEncoder extends MessageToByteEncoder {
     /**
      * byteBuf的组成 :
      *  req:
-     *  1.整个消息体占用的字节数        4字节
-     *  2.类型占用的字节数              4字节
-     *  3.版本占用的字节数              4字节
-     *  4.请求Id占用的字节数            4字节
+     *  1.整个消息体占用的字节数           4字节
+     *  2.类型占用的字节数                 4字节
+     *  3.版本占用的字节数                 4字节
+     *  4.请求Id占用字节数的值占用的字节数  4字节
+     *  4.请求Id占用的字节数               requestId.getBytes().length
      *  rsq:
-     *  1.整个消息体占用的字节数        4字节
-     *  2.类型占用的字节数              4字节
-     *  3.版本占用的字节数              4字节
-     *  4.请求Id占用的字节数            4字节
-     *  5.返回code占用的字节数          4字节
-     *  6.消息占用字节数的值占用的字节数 4字节
-     *  7.消息占用的字节数              errMsg.getBytes().length
+     *  1.整个消息体占用的字节数           4字节
+     *  2.类型占用的字节数                 4字节
+     *  3.版本占用的字节数                 4字节
+     *  4.请求Id占用的字节数               4字节
+     *  5.返回code占用的字节数             4字节
+     *  6.消息占用字节数的值占用的字节数    4字节
+     *  7.消息占用的字节数                 errMsg.getBytes().length
      */
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {

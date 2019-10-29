@@ -3,7 +3,6 @@ package com.jxin.rpc.center.register;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -23,22 +22,22 @@ public interface RegisterCenter extends Closeable {
 
     /**
      * 连接注册中心
-     * @param registerCenterUri 注册中心地址
+     * @param  registerCenterUri 注册中心地址
      * @throws RegisterCenterExc 协议不合法
      * @author 蔡佳新
      */
     void connect(URI registerCenterUri);
     /**
      * 注册服务
-     * @param application 服务名称
-     * @param uri         服务地址
+     * @param  application 服务名称
+     * @param  uri         服务地址
      * @author 蔡佳新
      */
     void registerService(String application, URI uri);
 
     /**
      * 查询服务地址
-     * @param application 服务名称
+     * @param  application 服务名称
      * @return 服务地址
      * @author 蔡佳新
      */

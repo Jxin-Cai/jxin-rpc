@@ -7,10 +7,10 @@ import com.jxin.rpc.core.util.serializer.GsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.Closeable;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.URI;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -30,11 +30,12 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
     private static final long LOOP_TIME = 10L;
     /**支持的协议列表*/
     private static final List<String> SCHEME_LIST = Lists.newArrayList("file");
+    /**空的URI列表*/
     private static final List<URI> EMPTY_URI = Lists.newArrayList();
-    /**配置文件*/
-    private Properties config = new Properties();
+    /**应用配置*/
+    private Properties appConfig = new Properties();
     /**配置文件地址*/
-    private String configFilePath = null;
+    private File configFile;
     /**定时任务执行线程池*/
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     /**定时任务的 Future对象*/
@@ -59,9 +60,7 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
         if(!SCHEME_LIST.contains(registerCenterUri.getScheme())){
             throw new RegisterCenterExc("Unlawfulness scheme!");
         }
-
-        final String path = getPath();
-        configFilePath = path + registerCenterUri.getPath();
+        configFile = new File(registerCenterUri);
         load();
     }
 
@@ -71,44 +70,37 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
      * @author 蔡佳新
      */
     private void load(){
-        synchronized (config){
-            try (final FileInputStream fi = new FileInputStream(configFilePath)){
-                config.load(fi);
+        synchronized (appConfig){
+            try (final FileInputStream fi = new FileInputStream(configFile)){
+                appConfig.load(fi);
             }catch (Exception e){
                 throw new RegisterCenterExc(e);
             }
         }
     }
 
-    /**
-     * 根据不同系统获取不同路径
-     * @throws RegisterCenterExc 不合法的系统类型
-     * @return 路径
-     */
-    private String getPath() {
-        if(SystemUtils.IS_OS_WINDOWS){
-            return "E:\\tmp\\";
-        }
-        if(SystemUtils.IS_OS_LINUX){
-            return "/tmp";
-        }
-        throw new RegisterCenterExc("Unlawfulness os");
-    }
+
 
     @Override
     public void registerService(String application, URI uri){
-        synchronized (config){
-            final String uriListStr = config.getProperty(application);
+        synchronized (appConfig){
+            final String uriListStr = appConfig.getProperty(application);
             if(StringUtils.isBlank(uriListStr)){
-                config.setProperty(application, GsonUtil.GsonToStr(Lists.newArrayList(uri)));
+                appConfig.setProperty(application, GsonUtil.GsonToStr(Lists.newArrayList(uri)));
                 return;
             }
             final List<URI> uris = GsonUtil.GsonToList(uriListStr, URI.class);
             uris.add(uri);
-            config.setProperty(application, GsonUtil.GsonToStr(uris));
+            appConfig.setProperty(application, GsonUtil.GsonToStr(uris));
+            try (final RandomAccessFile raf = new RandomAccessFile(configFile, "rw");
+                 final FileChannel fileChannel = raf.getChannel()){
 
-            try (final FileOutputStream fo = new FileOutputStream(configFilePath)){
-                config.store(fo, application);
+                final FileLock lock = fileChannel.lock();
+                try (final FileOutputStream fo = new FileOutputStream(configFile)){
+                    appConfig.store(fo, application);
+                }finally {
+                    lock.release();
+                }
             }catch (Exception e){
                 throw new RegisterCenterExc(e);
             }
@@ -117,7 +109,7 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
 
     @Override
     public List<URI> getService(String application){
-        final String uriListStr = config.getProperty(application);
+        final String uriListStr = appConfig.getProperty(application);
         if(StringUtils.isBlank(uriListStr)){
             load();
             return EMPTY_URI;

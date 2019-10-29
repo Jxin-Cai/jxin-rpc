@@ -26,7 +26,8 @@ public class NettyServer implements Server {
     private static final EventLoopGroup workEventGroup = newEventLoopGroup();
     /**连接*/
     private Channel channel;
-    // 请求执行器的调度执行器
+
+    /**请求执行器的调度执行器*/
     private static final ProviderDispatchHander PROVIDER_DISPATCH_HANDER = new ProviderDispatchHander();
     /**请求反编译器*/
     private static final ReqDecoder REQ_DECODER = new ReqDecoder();
@@ -109,4 +110,5 @@ public class NettyServer implements Server {
             channel.close();
         }
     }
+
 }

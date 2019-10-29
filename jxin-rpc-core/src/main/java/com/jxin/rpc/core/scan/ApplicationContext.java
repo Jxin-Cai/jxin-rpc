@@ -3,6 +3,7 @@ package com.jxin.rpc.core.scan;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.exc.ScanExc;
 import com.jxin.rpc.core.inject.RegistService;
 import com.jxin.rpc.core.inject.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,9 +31,9 @@ public class ApplicationContext {
     /**全部服务上下文*/
     private Map<String/*serviceName*/, List<Object>/*serviceImplList*/> serviceContext = Maps.newHashMap();
     /**注册服务上下文*/
-    private Map<String/*interfaceName*/, List<Object>/*serviceImplList*/> registServiceContext = Maps.newHashMap();
+    private Map<String/*interfaceName*/, Object/*serviceImpl*/> registServiceContext = Maps.newHashMap();
     /**注册服务方法上下文*/
-    private Map<Object/*serviceImpl*/, Map<MethodMark, Method>/*methodMap*/> registMethodContext = Maps.newHashMap();
+    private Map<String/*interfaceName*/, Map<MethodMark, Method>/*methodMap*/> registMethodContext = Maps.newHashMap();
 
 
     public ApplicationContext(String pkg) {
@@ -46,20 +48,31 @@ public class ApplicationContext {
     /**
      * 根据接口类全路径名 获取服务名
      * @param  interfaceName 接口类全路径名
-     * @return 实现类列表
+     * @return 实现类
      * @author 蔡佳新
      */
-    public List<Object> getRegistServiceList(String interfaceName) {
+    public Object getRegistServiceList(String interfaceName) {
         return registServiceContext.get(interfaceName);
     }
     /**
      * 根据实现类名 获取方法Map
-     * @param  obj 实现类名
+     * @param  interfaceName 接口名
      * @return 实现类列表
      * @author 蔡佳新
      */
-    public Map<MethodMark, Method> getRegistMethod(Object obj) {
-        return registMethodContext.get(obj);
+    public Map<MethodMark, Method> getRegistMethod(String interfaceName) {
+        return registMethodContext.get(interfaceName);
+    }
+
+    /**
+     * 获取所有注册的服务
+     * @return 所有注册的服务
+     * @author 蔡佳新
+     */
+    public Map<String/*interfaceName*/, List<MethodMark>> getAllService(){
+        final Map<String/*interfaceName*/, List<MethodMark>> result = new HashMap<>(registMethodContext.size());
+        registMethodContext.forEach((k,v) -> result.put(k, Lists.newArrayList(v.keySet())));
+        return result;
     }
     //***********************************************scanPackage********************************************************
     /**
@@ -70,8 +83,9 @@ public class ApplicationContext {
     private void scanPackage(final String pkg){
         final String pkgDirPath = pkg.replaceAll("\\.", "/");
         final URL url = getClass().getClassLoader().getResource(pkgDirPath);
+        assert url != null;
         final File pkgDir = new File(url.getFile());
-        final File fs[] = pkgDir.listFiles(file -> {
+        final File[] fs = pkgDir.listFiles(file -> {
             // 文件夹过滤掉,递归进去扫
             if(file.isDirectory()){
                 scanPackage(pkg + "." + file.getName());
@@ -104,15 +118,15 @@ public class ApplicationContext {
      * @param  obj 对象
      * @author 蔡佳新
      */
-    public void putService(Object obj) {
+    private void putService(Object obj) {
         final Class<?> clazz = obj.getClass();
         for (Class<?> interfaceClass : clazz.getInterfaces()) {
             final AnnotatedType[] annotatedInterfaces = interfaceClass.getAnnotatedInterfaces();
             if(Arrays.stream(annotatedInterfaces).anyMatch(this::isRegistService)){
-                putServiceContext(obj, interfaceClass.getName(), registServiceContext);
+                registServiceContext.put(interfaceClass.getName(), obj);
             }
         }
-        putServiceContext(obj, clazz.getCanonicalName(), serviceContext);
+        putServiceContext(obj, clazz.getSimpleName());
     }
 
     /**
@@ -129,13 +143,12 @@ public class ApplicationContext {
      * 往注册服务上下文添加服务实现类
      * @param  obj          服务实现类
      * @param  serviceName  服务名
-     * @param  context 上下文
      * @author 蔡佳新
      */
-    private void putServiceContext(Object obj, String serviceName, Map<String, List<Object>> context) {
-        final List<Object> beanList = context.get(serviceName);
+    private void putServiceContext(Object obj, String serviceName) {
+        final List<Object> beanList = serviceContext.get(serviceName);
         if(CollectionUtils.isEmpty(beanList)){
-            context.put(serviceName, Lists.newArrayList(obj));
+            serviceContext.put(serviceName, Lists.newArrayList(obj));
             return;
         }
         beanList.add(obj);
@@ -184,23 +197,31 @@ public class ApplicationContext {
      * @author 蔡佳新
      */
     private void putAllMethod(){
-        registServiceContext.forEach((k, v) -> v.forEach(this::putMethodContext));
+        registServiceContext.keySet().forEach(this::putMethodContext);
     }
 
     /**
      * 往methodContext中添加 服务实例的所有方法
-     * @param  obj 服务实例
+     * @param  interfaceName 接口名
      * @author 蔡佳新
      */
-    private void putMethodContext(Object obj){
-        final Method[] methods = obj.getClass().getMethods();
+    private void putMethodContext(String interfaceName){
+        final Class<?> interfaceClazz;
+        try {
+            interfaceClazz = Class.forName(interfaceName);
+        } catch (ClassNotFoundException e) {
+            throw new ScanExc(e);
+        }
+        final Method[] methods = interfaceClazz.getMethods();
         Arrays.stream(methods).forEach(method ->{
             final MethodMark methodMark = createMethodMark(method.getName(), method.getParameterTypes());
-            final Map<MethodMark, Method> methodMarkMethodMap = registMethodContext.get(obj);
+            final Map<MethodMark, Method> methodMarkMethodMap = registMethodContext.get(interfaceName);
             if(MapUtils.isEmpty(methodMarkMethodMap)){
                 final Map<MethodMark, Method> methodMap = Maps.newHashMap();
                 methodMap.put(methodMark, method);
-                registMethodContext.put(obj, methodMap);
+                registMethodContext.put(interfaceName, methodMap);
+            }else {
+                methodMarkMethodMap.put(methodMark, method);
             }
         });
     }
@@ -223,5 +244,4 @@ public class ApplicationContext {
                          .argMarkArrStr(MethodMark.joinArgMarkArrToString(paramClassArr))
                          .build();
     }
-
 }
