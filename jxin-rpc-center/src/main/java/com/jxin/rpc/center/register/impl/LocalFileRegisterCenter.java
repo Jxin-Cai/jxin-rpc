@@ -10,7 +10,6 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Properties;
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
     /**定时任务的调用间隔*/
-    protected static final long LOOP_TIME = 10L;
+    private static final long LOOP_TIME = 10L;
     /**支持的协议列表*/
     private static final List<String> SCHEME_LIST = Lists.newArrayList("file");
     private static final List<URI> EMPTY_URI = Lists.newArrayList();
@@ -117,7 +116,7 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
     }
 
     @Override
-    public List<URI> getService(String application) throws IOException {
+    public List<URI> getService(String application){
         final String uriListStr = config.getProperty(application);
         if(StringUtils.isBlank(uriListStr)){
             load();
@@ -127,7 +126,7 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close(){
         scheduledFuture.cancel(true);
         scheduledExecutorService.shutdown();
     }

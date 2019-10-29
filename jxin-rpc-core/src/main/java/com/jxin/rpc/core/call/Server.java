@@ -1,4 +1,4 @@
-package com.jxin.rpc.server.call;
+package com.jxin.rpc.core.call;
 
 /**
  * 服务端
@@ -7,6 +7,6 @@ package com.jxin.rpc.server.call;
  * @since 2019/10/23 16:05
  */
 public interface Server {
-    void start(int port) throws Exception;
+    void start(int port) throws InterruptedException;
     void stop();
 }

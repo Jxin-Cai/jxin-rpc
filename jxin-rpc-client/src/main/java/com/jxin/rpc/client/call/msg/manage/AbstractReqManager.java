@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  * @since 2019/10/22 15:38
  */
 
-public abstract class AbstractReqManager implements Closeable, ReqManager{
+public abstract class AbstractReqManager implements ReqManager{
     /**定时任务的调用间隔*/
     protected static final long LOOP_TIME = 10L;
     /**线程安全的 全局响应实体容器*/
@@ -61,12 +61,5 @@ public abstract class AbstractReqManager implements Closeable, ReqManager{
     public void close(){
         scheduledFuture.cancel(true);
         scheduledExecutorService.shutdown();
-    }
-
-    /**
-     * 关闭所有资源
-     */
-    public void closeAll(){
-        close();
     }
 }

@@ -2,6 +2,7 @@ package com.jxin.rpc.client.call.msg.manage;
 
 import com.jxin.rpc.core.inject.Singleton;
 
+import java.io.Closeable;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeoutException;
  * @since 2019/10/28 15:46
  */
 @Singleton
-public interface ReqManager {
+public interface ReqManager extends Closeable {
     /**
      * 往全局响应实体容器中添加新的响应实体
      * @param  rspFuture 聚合Future类型响应消息实体的响应体
@@ -27,9 +28,4 @@ public interface ReqManager {
      * @author 蔡佳新
      */
     RspFuture remove(String requestId);
-
-    /**
-     * 关闭所有资源
-     */
-    void closeAll();
 }

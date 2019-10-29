@@ -2,7 +2,7 @@ package com.jxin.rpc.core.consts;
 
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
-import com.jxin.rpc.server.hander.ProviderHander;
+import com.jxin.rpc.core.server.hander.ProviderHander;
 import lombok.AllArgsConstructor;
 
 import java.util.Collection;

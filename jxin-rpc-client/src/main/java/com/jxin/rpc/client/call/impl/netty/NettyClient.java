@@ -16,6 +16,7 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -141,7 +142,7 @@ public class NettyClient implements Client {
                               .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
     }
     @Override
-    public void close() {
+    public void close() throws IOException {
         for (Channel channel : channels) {
             if(channel != null) {
                 channel.close();
@@ -151,6 +152,6 @@ public class NettyClient implements Client {
         if (eventGroup != null) {
             eventGroup.shutdownGracefully();
         }
-        REQ_MANAGER.closeAll();
+        REQ_MANAGER.close();
     }
 }

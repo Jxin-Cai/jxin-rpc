@@ -2,6 +2,7 @@ package com.jxin.rpc.center.register;
 
 import com.jxin.rpc.center.exc.RegisterCenterExc;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @since 2019/10/28 21:07
  */
-public interface RegisterCenter {
+public interface RegisterCenter extends Closeable {
     /**
      * 所有支持的协议
      * @return 协议列表
@@ -33,7 +34,7 @@ public interface RegisterCenter {
      * @param uri         服务地址
      * @author 蔡佳新
      */
-    void registerService(String application, URI uri) throws IOException;
+    void registerService(String application, URI uri);
 
     /**
      * 查询服务地址
@@ -41,5 +42,5 @@ public interface RegisterCenter {
      * @return 服务地址
      * @author 蔡佳新
      */
-    List<URI> getService(String application) throws IOException;
+    List<URI> getService(String application);
 }
