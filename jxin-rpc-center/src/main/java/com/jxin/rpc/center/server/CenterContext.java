@@ -1,11 +1,13 @@
 package com.jxin.rpc.center.server;
 
 import com.google.common.collect.Maps;
+import com.jxin.rpc.center.feign.ForwordFeign;
 import com.jxin.rpc.center.register.RegisterCenter;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -29,7 +31,11 @@ public class CenterContext  {
     /**服务上下文*/
     private RegisterCenter registerCenter;
     /**发信器容器*/
-    private Map<URI, Sender> senderMap = Maps.newHashMap();
+    private final Map<URI, Sender> senderMap = Maps.newHashMap();
+    /**本地请求转发客户端 桩*/
+    private ForwordFeign localForwordFeign;
+    /**所有注册的服务的请求转发客户端 桩*/
+    private final Map<String/*applicationName*/, List<ForwordFeign>> applicationFeignListMap = Maps.newHashMap();
 
     /**
      * (函数式编程)
@@ -39,16 +45,33 @@ public class CenterContext  {
      * @param  mappingFunction 要执行的方法
      * @return 消息发送器
      */
-    public Sender computeIfAbsentFromSenderMap(URI uri,
-                                               Function<URI, Sender> mappingFunction) {
+    public Sender computeIfAbsentToSenderMap(URI uri,
+                                             Function<URI, Sender> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
         final Sender sender = this.senderMap.get(uri);
         if (sender != null) {
             return sender;
         }
-
         final Sender apply = mappingFunction.apply(uri);
         this.senderMap.put(uri, apply);
         return apply;
+    }
+    /**
+     * (函数式编程)
+     * 如果key在容器中无值,则往<code>applicationFeignListMap</code>中添加application
+     * @param  applicationName 服务名
+     * @param  serviceUriList  服务的节点uri课表
+     * @param  mappingFunction 要执行的方法
+     * @author 蔡佳新
+     */
+    public void computeIfAbsentToApplicationFeignListMap(String applicationName,
+                                                         List<URI> serviceUriList,
+                                                         Function<List<URI>, List<ForwordFeign>> mappingFunction) {
+        Objects.requireNonNull(mappingFunction);
+        final List<ForwordFeign> forwordFeigns = this.applicationFeignListMap.get(applicationName);
+        if (CollectionUtils.isNotEmpty(forwordFeigns)) {
+           return;
+        }
+        this.applicationFeignListMap.put(applicationName, mappingFunction.apply(serviceUriList));
     }
 }

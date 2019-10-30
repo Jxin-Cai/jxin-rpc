@@ -1,5 +1,6 @@
 package com.jxin.rpc.center.server.hander.impl;
 
+import com.jxin.rpc.center.feign.ForwordFeign;
 import com.jxin.rpc.center.server.CenterContext;
 import com.jxin.rpc.center.server.CenterContextSub;
 import com.jxin.rpc.core.call.msg.MsgContext;
@@ -37,11 +38,13 @@ public class AgentProviderHander implements ProviderHander, CenterContextSub {
             if(centerContext.getApplicationName().equals(reqMsg.getServerMark().getApplication())){
                 // 服务存在校验
                 serviceExistValidate(reqMsg);
+                return centerContext.getLocalForwordFeign().forwordRemoteService(msg);
             }
-
-
-
-
+            final List<ForwordFeign> forwordFeigns = centerContext.getApplicationFeignListMap()
+                                                                  .get(reqMsg.getServerMark().getApplication());
+            assert CollectionUtils.isNotEmpty(forwordFeigns) : "none register server : " + reqMsg.getServerMark().getApplication();
+            final int abs = Math.abs(header.getRequestId().hashCode()) % forwordFeigns.size();
+            return forwordFeigns.get(abs).forwordRemoteService(msg);
         } catch (Exception e) {
             // 发生异常,返回UNKNOWN_ERROR错误响应。
             log.warn("Exception: ", e);

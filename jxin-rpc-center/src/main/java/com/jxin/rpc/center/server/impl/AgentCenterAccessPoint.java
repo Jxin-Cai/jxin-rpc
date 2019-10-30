@@ -2,16 +2,36 @@ package com.jxin.rpc.center.server.impl;
 
 import com.jxin.rpc.center.call.ForwordClient;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
+import com.jxin.rpc.center.feign.ForwordFeign;
+import com.jxin.rpc.center.register.RegisterCenter;
+import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
 import com.jxin.rpc.center.server.CenterContext;
 import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
+import com.jxin.rpc.core.call.Server;
+import com.jxin.rpc.core.call.msg.MsgContext;
+import com.jxin.rpc.core.call.msg.RspMsg;
+import com.jxin.rpc.core.call.msg.header.ReqHeader;
+import com.jxin.rpc.core.call.msg.header.RspHeader;
+import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
+import com.jxin.rpc.core.consts.ProVersionConsts;
+import com.jxin.rpc.core.consts.ProviderEnum;
+import com.jxin.rpc.core.consts.RspStatusEnum;
+import com.jxin.rpc.core.exc.RPCExc;
 import com.jxin.rpc.core.feign.FeignFactory;
+import com.jxin.rpc.core.util.IdUtil;
+import com.jxin.rpc.core.util.serializer.SerializeUtil;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
+import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 代理中心接入实现
@@ -20,61 +40,131 @@ import java.net.URI;
  * @since 2019/10/29 20:45
  */
 public class AgentCenterAccessPoint implements AccessPoint {
+    /**连接超时时间*/
     private static final long CONNECTION_TIMEOUT = 30000L;
+    /**host*/
     private static final String HOST = "localhost";
-    private static final int PORT = 9999;
-    private static final URI CENTER_URI = URI.create("rpc://" + HOST + ":" + PORT);
-    private final Sender LOCAL_SENDER = createSender(CENTER_URI, CLIENT);
-
+    /**请求转发客户端*/
     private static final ForwordClient FORWORD_CLIENT = ServiceLoaderUtil.load(ForwordClient.class);
-    private static final Client CLIENT = ServiceLoaderUtil.load(Client.class);
+    /**客户端*/
+    private static final Client CLIENT =  ServiceLoaderUtil.load(Client.class);
+    /**代理中心上下文*/
     private static final CenterContext CENTER_CONTEXT = CenterContext.builder().build();
+    /**桩(装)的工厂类*/
     private static final FeignFactory FEIGN_FACTORY = ServiceLoaderUtil.load(FeignFactory.class);
+    /**服务端*/
+    private Server server = null;
     //***********************************************addRemoteService***************************************************
     /**
-     * TODO 代理端的客户端生成得改写下,不需要具体到接口
-     * 客户端获取远程服务的引用
-     * @param  uri 远程服务地址
-     * @param  serviceClass 服务的接口类的Class
-     * @param  <T> 服务接口的类型
-     * @return 远程服务引用
-     */
-    @Override
-    public <T> T addRemoteService(URI uri, Class<T> serviceClass) {
-        final Sender sender = computeIfAbsentFromSenderMap(uri);
-        return FEIGN_FACTORY.createFeign(sender,
-                                         serviceClass,
-                                         ServerMark.builder()
-                                                   .application(CENTER_CONTEXT.getApplicationName())
-                                                   .interfaceName(serviceClass.getName())
-                                                   .build());
-    }
-    //***********************************************getLocalSender***************************************************
-    @Override
-    public Sender getLocalSender() {
-        return LOCAL_SENDER;
-    }
-
-
-    //***********************************************setApplicationName*************************************************
-    /**
-     * 设置服务名
-     * @param  applicationName 服务名
+     * 往 <code>CenterContext</code> 中添加远程服务转发feign实现
+     * @param  remoteServices 远程服务实例列表
+     * @param  serviceUri     注册中心URI
      * @author 蔡佳新
      */
     @Override
-    public void setApplicationName(String applicationName) {
+    public void addRemoteService(List<RemoteService> remoteServices, URI serviceUri) {
+        final RegisterCenter registerCenter = getRegisterCenter(serviceUri);
+        remoteServices.forEach(remoteService ->{
+            final List<URI> serviceUriList = registerCenter.getService(remoteService.getApplicationName());
+            assert CollectionUtils.isNotEmpty(serviceUriList) : "none register service : " + remoteService.getApplicationName();
+            CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService.getApplicationName(),
+                                                                    serviceUriList,
+                                                                    this::createForwordFeignListToApp);
+        });
+    }
+
+    //***********************************************getLocalForwordFeign***********************************************
+    /**
+     * 获得本地请求跳转 桩
+     * @return 本地请求跳转 桩
+     * @author 蔡佳新
+     */
+    @Override
+    public ForwordFeign getLocalForwordFeign() {
+        return CENTER_CONTEXT.getLocalForwordFeign();
+    }
+    //*************************************************startServer******************************************************
+    /**
+     * 启动服务
+     * @param  applicationName 服务名
+     * @param  clientPort      客户端端口号
+     * @param  serverPort      服务端端口号
+     * @throws InterruptedException 服务启动异常
+     * @author 蔡佳新
+     */
+    @Override
+    public void startServer(String applicationName, int clientPort, int serverPort) throws InterruptedException {
+        // 设置服务名
         CENTER_CONTEXT.setApplicationName(applicationName);
+        // 生成本地客户端请求桩
+        final Sender localSender = createSender(URI.create("rpc://" + HOST + ":" + clientPort), ServiceLoaderUtil.load(Client.class));
+        CENTER_CONTEXT.setLocalForwordFeign(
+                FEIGN_FACTORY.createFeign(localSender,
+                                          ForwordFeign.class,
+                                          ServerMark.builder()
+                                                    .application(CENTER_CONTEXT.getApplicationName())
+                                                    .build())
+        );
+        // 拉取注册的服务
+        CENTER_CONTEXT.setServiceContext(getRegisterService());
+        if (server == null) {
+            server = ServiceLoaderUtil.load(Server.class);
+            server.start(serverPort);
+        }
+    }
+    //***************************************private****startServer*****************************************************
+
+    /**
+     * 获取注册的服务列表
+     * @return 注册的服务列表
+     * @author 蔡佳新
+     */
+    private Map<String/*interfaceName*/, List<MethodMark>> getRegisterService() {
+        final MsgContext reqMsgContext = MsgContext.builder()
+                                                   .header(ReqHeader.builder()
+                                                                    .requestId(IdUtil.getUUID())
+                                                                    .version(ProVersionConsts.VERSION_1)
+                                                                    .type(ProviderEnum.REGISTER_PROVIDER.getType())
+                                                                    .build())
+                                                   .build();
+        return CENTER_CONTEXT.getLocalForwordFeign()
+                             .pullRegisterService(reqMsgContext);
+
     }
     //*************************************private****addRemoteService**************************************************
+    /**
+     * 创建服务的请求转发客户端 桩列表
+     * @param  serviceUriList 服务的节点uri课表
+     * @return 消息发送器
+     * @author 蔡佳新
+     */
+    private List<ForwordFeign> createForwordFeignListToApp(List<URI> serviceUriList) {
+        return serviceUriList.stream()
+                             .map(this::addRemoteService)
+                             .collect(Collectors.toList());
+    }
+    /**
+     * 客户端获取远程服务的引用
+     * @param  uri 远程服务地址
+     * @return 远程服务引用
+     * @author 蔡佳新
+     */
+    private ForwordFeign addRemoteService(URI uri) {
+        return FEIGN_FACTORY.createFeign(putToSenderMap(uri),
+                                         ForwordFeign.class,
+                                         ServerMark.builder()
+                                                   .application(CENTER_CONTEXT.getApplicationName())
+                                                   .interfaceName(ForwordFeign.class.getName())
+                                                   .build());
+    }
     /**
      * 如果key在容器中无值,则往<code>senderMap</code>中添加sender
      * 返回找到或者新生成的 {@link Sender}
      * @param  uri             map的key
      * @return 消息发送器
      */
-    private Sender computeIfAbsentFromSenderMap(URI uri) {
-        return CENTER_CONTEXT.computeIfAbsentFromSenderMap(uri, this::createSenderToRemote);
+    private Sender putToSenderMap(URI uri) {
+        return CENTER_CONTEXT.computeIfAbsentToSenderMap(uri, this::createSenderToRemote);
     }
     /**
      * 创建转发远端请求的消息发送器
@@ -98,5 +188,14 @@ public class AgentCenterAccessPoint implements AccessPoint {
         } catch (Exception e) {
             throw new RegisterCenterExc(e);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if(server != null) {
+            server.close();
+        }
+        FORWORD_CLIENT.close();
+        CLIENT.close();
     }
 }

@@ -20,6 +20,8 @@ public enum ProviderEnum {
     AGENT_PROVIDER("代理端提供者", 0),
     /**服务端提供者*/
     SERVER_PROVIDER("服务端提供者", 1),
+    /**服务端注册服务提供者*/
+    REGISTER_PROVIDER("服务端注册服务提供者", 2),
     ;
 
     /**请求名称*/

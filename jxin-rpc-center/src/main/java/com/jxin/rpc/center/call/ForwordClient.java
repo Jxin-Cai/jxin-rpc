@@ -3,12 +3,11 @@ package com.jxin.rpc.center.call;
 import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
 
-import java.io.Closeable;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 跳转客户端
+ * 请求转发客户端
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/22 17:52

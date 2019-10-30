@@ -102,7 +102,7 @@ public class NettyServer implements Server {
      * @author 蔡佳新
      */
     @Override
-    public void stop() {
+    public void close() {
         masterEventGroup.shutdownGracefully();
         workEventGroup.shutdownGracefully();
 

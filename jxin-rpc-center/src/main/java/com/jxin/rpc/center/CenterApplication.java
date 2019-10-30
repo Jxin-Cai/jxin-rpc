@@ -2,15 +2,12 @@ package com.jxin.rpc.center;
 
 import com.google.common.collect.Lists;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
-import com.jxin.rpc.center.register.RegisterCenter;
 import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
-import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -22,22 +19,13 @@ import java.util.List;
 public class CenterApplication {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         final AccessPoint accessPoint = ServiceLoaderUtil.load(AccessPoint.class);
-        accessPoint.setApplicationName("jxin-client");
+        accessPoint.startServer("jxin-client", 9999, 5555);
         final File file = new File(getPath() + "application.properties");
-        final RegisterCenter registerCenter = accessPoint.getRegisterCenter(file.toURI());
         final List<RemoteService> remoteServices = mockRemoteServiceList();
-        remoteServices.forEach(remoteService ->{
-            final List<URI> uriList = registerCenter.getService(remoteService.getApplicationName());
-            uriList.forEach(uri -> {
-
-
-            });
-
-        });
-
-        
+        // 中添加远程服务转发feign实现
+        accessPoint.addRemoteService(remoteServices, file.toURI());
     }
 
     /**
@@ -69,9 +57,4 @@ public class CenterApplication {
         }
         throw new RegisterCenterExc("Unlawfulness os");
     }
-
-
-
-
-
 }

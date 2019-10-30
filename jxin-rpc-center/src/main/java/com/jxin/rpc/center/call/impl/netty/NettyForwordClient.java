@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
- *  跳转客户端 netty实现
+ *  请求转发客户端 netty实现
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/29 17:22

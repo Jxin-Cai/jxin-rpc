@@ -5,6 +5,7 @@ import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.SenderSub;
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.ReqMsg;
+import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.call.msg.header.ReqHeader;
 import com.jxin.rpc.core.call.msg.header.RspHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
@@ -65,7 +66,8 @@ public abstract class AbstractFeignProxy implements SenderSub {
 
         final RspHeader rspHeader = (RspHeader) rspMsgContext.getHeader();
         if(RspStatusEnum.RES_CODE_200.getCode().equals(rspHeader.getCode())) {
-            return SerializeUtil.parse(rspMsgContext.getBody());
+            final RspMsg rspMsg = SerializeUtil.parse(rspMsgContext.getBody());
+            return rspMsg.getReturnArg();
         }
         throw new RPCExc(rspHeader.getErrMsg());
     }

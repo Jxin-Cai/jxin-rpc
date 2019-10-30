@@ -1,13 +1,16 @@
 package com.jxin.rpc.center.server;
 
 import com.jxin.rpc.center.exc.RegisterCenterExc;
+import com.jxin.rpc.center.feign.ForwordFeign;
 import com.jxin.rpc.center.register.RegisterCenter;
-import com.jxin.rpc.core.call.Client;
+import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 
+import java.io.Closeable;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 接入接口
@@ -15,28 +18,30 @@ import java.util.Collection;
  * @version 1.0
  * @since 2019/10/29 20:40
  */
-public interface AccessPoint {
+public interface AccessPoint extends Closeable {
     /**
-     * 客户端获取远程服务的引用
-     * @param  uri 远程服务地址
-     * @param  serviceClass 服务的接口类的Class
-     * @param  <T> 服务接口的类型
-     * @return 远程服务引用
-     */
-    <T> T addRemoteService(URI uri, Class<T> serviceClass);
-    /**
-     * 获得本地消息发送器
-     * @return 本地消息发送器
+     * 往 <code>CenterContext</code> 中添加远程服务转发feign实现
+     * @param  remoteServices 远程服务实例列表
+     * @param  serviceUri     注册中心URI
      * @author 蔡佳新
      */
-    Sender getLocalSender();
+    void addRemoteService(List<RemoteService> remoteServices, URI serviceUri);
+    /**
+     * 获得本地请求跳转 桩
+     * @return 本地请求跳转 桩
+     * @author 蔡佳新
+     */
+    ForwordFeign getLocalForwordFeign();
 
     /**
-     * 设置服务名
+     * 启动服务
      * @param  applicationName 服务名
+     * @param  clientPort      客户端端口号
+     * @param  serverPort      服务端端口号
+     * @throws InterruptedException 服务启动异常
      * @author 蔡佳新
      */
-    void setApplicationName(String applicationName);
+    void startServer(String applicationName, int clientPort, int serverPort) throws InterruptedException;
     /**
      * 获取注册中心的实现
      * @param  serviceUri 注册中心URI
