@@ -78,13 +78,21 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
     @Override
     public void addRemoteService(List<RemoteService> remoteServices, URI serviceUri) {
         final RegisterCenter serviceRegisterCenter = getRegisterCenter(serviceUri);
-        remoteServices.forEach(remoteService ->{
-            final List<URI> serviceUriList = serviceRegisterCenter.getService(remoteService.getApplicationName());
-            assert CollectionUtils.isNotEmpty(serviceUriList) : "none register service : " + remoteService.getApplicationName();
-            CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService.getApplicationName(),
-                                                                    serviceUriList,
-                                                                    this::createForwordFeignListToApp);
-        });
+        try {
+            remoteServices.forEach(remoteService ->{
+                final List<URI> serviceUriList = serviceRegisterCenter.getService(remoteService.getApplicationName());
+                assert CollectionUtils.isNotEmpty(serviceUriList) : "none register service : " + remoteService.getApplicationName();
+                CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService.getApplicationName(),
+                                                                        serviceUriList,
+                                                                        this::createForwordFeignListToApp);
+            });
+        }finally {
+            try {
+                serviceRegisterCenter.close();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 
     //***********************************************getLocalForwordFeign***********************************************

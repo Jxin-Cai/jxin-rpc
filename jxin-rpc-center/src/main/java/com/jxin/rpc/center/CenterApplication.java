@@ -6,6 +6,7 @@ import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
 import com.jxin.rpc.center.server.impl.AgentCenterAccessPoint;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -17,18 +18,28 @@ import java.util.List;
  * @version 1.0
  * @since 2019/10/29 18:03
  */
+@Slf4j
 public class CenterApplication {
 
 
-    public static void main(String[] args) throws InterruptedException {
-        final AccessPoint accessPoint = ServiceLoaderUtil.load(AccessPoint.class);
-        Runtime.getRuntime().addShutdownHook((AgentCenterAccessPoint)accessPoint);
-        final File file = new File(getPath() + "application.properties");
-        accessPoint.startServer("jxin-client", file.toURI(), 9999, 5555);
+    public static void main(String[] args) {
+        AccessPoint accessPoint = null;
+        try {
+            accessPoint = ServiceLoaderUtil.load(AccessPoint.class);
+            Runtime.getRuntime().addShutdownHook((Thread)accessPoint);
+            final File file = new File(getPath() + "application.properties");
+            accessPoint.startServer("jxin-client", file.toURI(), 9999, 5555);
 
-        final List<RemoteService> remoteServices = mockRemoteServiceList();
-        // 中添加远程服务转发feign实现
-        accessPoint.addRemoteService(remoteServices, file.toURI());
+            final List<RemoteService> remoteServices = mockRemoteServiceList();
+            // 中添加远程服务转发feign实现
+            accessPoint.addRemoteService(remoteServices, file.toURI());
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            if(accessPoint != null){
+                ((Thread)accessPoint).run();
+            }
+           // System.exit();
+        }
     }
 
     /**
