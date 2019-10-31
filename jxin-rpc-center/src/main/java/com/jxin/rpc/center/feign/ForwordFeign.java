@@ -11,6 +11,7 @@ import com.jxin.rpc.core.util.serializer.SerializeUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 请求转发客户端 桩
@@ -42,7 +43,7 @@ public interface ForwordFeign {
      */
     default Map<String/*interfaceName*/, List<MethodMark>> pullRegisterService(MsgContext reqMsgContext)  {
         try {
-            final MsgContext rspMsgContext = getSender().send(reqMsgContext).get();
+            final MsgContext rspMsgContext =  getSender().send(reqMsgContext).get();
             final RspHeader rspHeader = (RspHeader) rspMsgContext.getHeader();
             if(!RspStatusEnum.RES_CODE_200.getCode().equals(rspHeader.getCode())) {
                 throw new RPCExc(rspHeader.getErrMsg());

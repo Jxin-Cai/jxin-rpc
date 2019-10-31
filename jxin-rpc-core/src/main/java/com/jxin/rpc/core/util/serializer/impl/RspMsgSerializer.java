@@ -26,15 +26,29 @@ public class RspMsgSerializer implements Serializer<RspMsg> {
         buffer.putInt(returnArgMarkByteArr.length);
         buffer.put(returnArgMarkByteArr);
         // returnArg
-        final byte[] returnArgByteArr;
-        if(obj.getReturnArgMark().isMulti()){
-            final Class<?> clazz = ArgMarkUtil.getClazz(obj.getReturnArgMark().getClassMark());
-            returnArgByteArr = ProtoStuffUtil.serializeList(obj, clazz);
-        }else {
-            returnArgByteArr = ProtoStuffUtil.serialize(obj);
-        }
+        final byte[] returnArgByteArr = getReturnArgByteArr(obj.getReturnArgMark(), obj.getReturnArg());
         buffer.putInt(returnArgByteArr.length);
         buffer.put(returnArgByteArr);
+    }
+
+    /**
+     * 获得 返回参数列表的二进制数组
+     * @param  returnArg 返回参数列表
+     * @return 返回参数列表的二进制数组
+     * @author 蔡佳新
+     */
+    private byte[] getReturnArgByteArr(ReturnArgMark returnArgMark, Object returnArg) {
+        final byte[] result;
+        if(returnArg == null){
+            return EMPTY_BYTE_ARR;
+        }
+        if(returnArgMark.isMulti()){
+            final Class<?> clazz = ArgMarkUtil.getClazz(returnArgMark.getClassMark());
+            result = ProtoStuffUtil.serializeList(returnArg, clazz);
+        }else {
+            result = ProtoStuffUtil.serialize(returnArg);
+        }
+        return result;
     }
 
     @Override
@@ -68,7 +82,8 @@ public class RspMsgSerializer implements Serializer<RspMsg> {
 
     @Override
     public Integer size(RspMsg obj) {
-        return ProtoStuffUtil.serialize(obj).length;
+        return Integer.BYTES + ProtoStuffUtil.serialize(obj.getReturnArgMark()).length
+               + Integer.BYTES + getReturnArgByteArr(obj.getReturnArgMark(), obj.getReturnArg()).length;
     }
 
     @Override

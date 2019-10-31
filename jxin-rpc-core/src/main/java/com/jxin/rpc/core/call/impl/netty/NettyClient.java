@@ -41,10 +41,6 @@ public class NettyClient implements Client {
 
     /**响应消息完结执行器*/
     private static final RspCompleteHander RSP_COMPLETE_HANDER;
-    /**响应反编译器*/
-    private static final RspDecoder RSP_DECODER = new RspDecoder();
-    /**请求编译器*/
-    private static final ReqEncoder REQ_ENCODER = new ReqEncoder();
     static {
         REQ_MANAGER = ServiceLoaderUtil.load(ReqManager.class);
         RSP_COMPLETE_HANDER = new RspCompleteHander(REQ_MANAGER);
@@ -114,8 +110,8 @@ public class NettyClient implements Client {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
-                        .addLast(RSP_DECODER)
-                        .addLast(REQ_ENCODER)
+                        .addLast(new RspDecoder())
+                        .addLast(new ReqEncoder())
                         .addLast(RSP_COMPLETE_HANDER);
             }
         };

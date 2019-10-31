@@ -32,6 +32,9 @@ public class RegisterProviderHander implements ProviderHander, ApplicationContex
     @Override
     public MsgContext handle(MsgContext msg) {
         final Header header = msg.getHeader();
+        if(applicationContext == null){
+            return createMsgContext(header, null);
+        }
         final Map<String, List<MethodMark>> allService = applicationContext.getAllService();
         return createMsgContext(header, allService);
     }
@@ -45,14 +48,9 @@ public class RegisterProviderHander implements ProviderHander, ApplicationContex
      */
     private MsgContext createMsgContext(Header header,
                                         Object returnObj) {
-        if(!(returnObj instanceof Iterable)){
-            throw new RPCExc("register server err");
-        }
-        final Iterable returnIte = (Iterable)returnObj;
-        final Class<?> clazz = returnIte.iterator().next().getClass();
         final ReturnArgMark returnArgMark = ReturnArgMark.builder()
-                                                         .multi(true)
-                                                         .classMark(ArgMarkUtil.getMark(clazz))
+                                                         .multi(false)
+                                                         .classMark(ArgMarkUtil.getMark(returnObj == null? Object.class : returnObj.getClass()))
                                                          .build();
         return MsgContext.builder()
                          .header(RspHeader.builder()

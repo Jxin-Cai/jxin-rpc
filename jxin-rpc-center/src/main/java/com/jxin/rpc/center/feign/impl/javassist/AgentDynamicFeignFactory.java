@@ -18,7 +18,7 @@ public class AgentDynamicFeignFactory implements FeignFactory {
     @Override
     public <T> T createFeign(Sender sender, Class<T> insterface, ServerMark serverMark) {
         // 填充模板
-        final String feignName = serverMark.getApplication() + "Feign";
+        final String feignName = upperCase(serverMark.getApplication()) + "Feign";
         final ClassPool pool = ClassPool.getDefault();
         final Object obj;
         try {
@@ -31,6 +31,7 @@ public class AgentDynamicFeignFactory implements FeignFactory {
             // 2. 新增一个字段 private Sender sender;
             final CtField param = new CtField(ctClass, "sender", ccFeign);
             param.setModifiers(Modifier.PRIVATE);
+            ccFeign.addField(param);
             // 3. 添加无参的构造函数
             final CtConstructor defCons = new CtConstructor(emptyClassArr, ccFeign);
             defCons.setBody("{super();}");
@@ -58,4 +59,19 @@ public class AgentDynamicFeignFactory implements FeignFactory {
         // 返回这个桩
         return (T) obj;
     }
+
+    /**
+     * 首字母大写
+     * @param  str 字符串
+     * @return 首字母大写后的字符串
+     * @author 蔡佳新
+     */
+    private String upperCase(String str) {
+        final char[] ch = str.toCharArray();
+        if (ch[0] >= 'a' && ch[0] <= 'z') {
+            ch[0] = (char) (ch[0] - 32);
+        }
+        return new String(ch);
+    }
+
 }

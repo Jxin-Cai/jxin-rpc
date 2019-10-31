@@ -37,12 +37,10 @@ public class ProtoStuffUtil {
      * @author 蔡佳新
      */
     @SuppressWarnings("unchecked")
-    public static <T> byte[] serialize(@NotNull T obj) throws SerializeExc {
-        if (obj == null) {
-            throw new IllegalArgumentException("non null obj required");
-        }
+    public static <T> byte[] serialize(@NotNull T obj){
         final LinkedBuffer buffer = LinkedBuffer.allocate(LINKED_BUFFER_DEF_SIZE);
         try {
+            assert obj != null : "non null obj required";
             return ProtostuffIOUtil.toByteArray(obj,
                                                 (Schema<T>) RuntimeSchema.getSchema(obj.getClass()),
                                                 buffer);
@@ -63,15 +61,14 @@ public class ProtoStuffUtil {
      * @author 蔡佳新
      */
     @Nullable
-    public static <T> T deserialize(byte[] objByteArr, @NotNull Class<T> clazz) throws SerializeExc{
+    public static <T> T deserialize(byte[] objByteArr, @NotNull Class<T> clazz){
         if(ArrayUtils.isEmpty(objByteArr)){
             return null;
         }
-        if (clazz == null) {
-            throw new IllegalArgumentException("non null clazz required");
-        }
+
         final T result;
         try {
+            assert clazz != null : "non null clazz required";
             result = clazz.newInstance();
             ProtostuffIOUtil.mergeFrom(objByteArr, result, RuntimeSchema.getSchema(clazz));
         } catch (InstantiationException | IllegalAccessException e) {

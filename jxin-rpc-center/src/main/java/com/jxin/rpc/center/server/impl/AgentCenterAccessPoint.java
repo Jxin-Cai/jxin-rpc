@@ -11,18 +11,13 @@ import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.Server;
 import com.jxin.rpc.core.call.msg.MsgContext;
-import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.call.msg.header.ReqHeader;
-import com.jxin.rpc.core.call.msg.header.RspHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.consts.ProVersionConsts;
 import com.jxin.rpc.core.consts.ProviderEnum;
-import com.jxin.rpc.core.consts.RspStatusEnum;
-import com.jxin.rpc.core.exc.RPCExc;
 import com.jxin.rpc.core.feign.FeignFactory;
 import com.jxin.rpc.core.util.IdUtil;
-import com.jxin.rpc.core.util.serializer.SerializeUtil;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -42,6 +37,8 @@ import java.util.stream.Collectors;
 public class AgentCenterAccessPoint implements AccessPoint {
     /**连接超时时间*/
     private static final long CONNECTION_TIMEOUT = 30000L;
+    /**空的字节码数组*/
+    private static final byte[] EMPTY_BYTE_ARR = new byte[0];
     /**host*/
     private static final String HOST = "localhost";
     /**请求转发客户端*/
@@ -126,6 +123,7 @@ public class AgentCenterAccessPoint implements AccessPoint {
                                                                     .version(ProVersionConsts.VERSION_1)
                                                                     .type(ProviderEnum.REGISTER_PROVIDER.getType())
                                                                     .build())
+                                                   .body(EMPTY_BYTE_ARR)
                                                    .build();
         return CENTER_CONTEXT.getLocalForwordFeign()
                              .pullRegisterService(reqMsgContext);

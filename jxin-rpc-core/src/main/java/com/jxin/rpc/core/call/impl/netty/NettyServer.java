@@ -29,10 +29,6 @@ public class NettyServer implements Server {
 
     /**请求执行器的调度执行器*/
     private static final ProviderDispatchHander PROVIDER_DISPATCH_HANDER = new ProviderDispatchHander();
-    /**请求反编译器*/
-    private static final ReqDecoder REQ_DECODER = new ReqDecoder();
-    /**响应编译器*/
-    private static final RspEncoder RSP_ENCODER = new RspEncoder();
 
     /**
      * 启动服务
@@ -75,8 +71,8 @@ public class NettyServer implements Server {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
-                        .addLast(REQ_DECODER)
-                        .addLast(RSP_ENCODER)
+                        .addLast(new ReqDecoder())
+                        .addLast(new RspEncoder())
                         .addLast(PROVIDER_DISPATCH_HANDER);
             }
         };
@@ -84,7 +80,7 @@ public class NettyServer implements Server {
 
     /**
      * 创建服务启动实例
-     * @param  channelHandler   连接执行器
+     * @param  channelHandler 连接执行器
      * @return 服务启动实例
      * @author 蔡佳新
      */

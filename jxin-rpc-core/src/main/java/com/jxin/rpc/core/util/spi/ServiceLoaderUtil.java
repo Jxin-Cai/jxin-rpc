@@ -38,7 +38,8 @@ public class ServiceLoaderUtil {
      */
     public static synchronized <T> Collection<T> loadAll(Class<T> service) {
         return StreamSupport.stream(ServiceLoader.load(service).spliterator(), false)
-                            .map(ServiceLoaderUtil::singletonFilter).collect(Collectors.toList());
+                            .map(ServiceLoaderUtil::singletonFilter)
+                            .collect(Collectors.toList());
     }
     /**
      * 单例服务过滤器

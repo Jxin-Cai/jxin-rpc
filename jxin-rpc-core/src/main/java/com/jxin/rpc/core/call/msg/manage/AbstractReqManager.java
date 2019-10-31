@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  */
 public abstract class AbstractReqManager implements ReqManager{
     /**定时任务的调用间隔*/
-    protected static final long LOOP_TIME = 10L;
+    protected static final long LOOP_TIME = 20L;
     /**线程安全的 全局响应实体容器*/
     protected final Map<String/*requestId*/, RspFuture> futureMap = new ConcurrentHashMap<>();
     /**定时任务执行线程池*/

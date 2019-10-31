@@ -10,7 +10,7 @@ import com.jxin.rpc.core.inject.Nullable;
  * @since 2019/10/21 21:07
  */
 public interface Serializer<T> {
-
+    byte[] EMPTY_BYTE_ARR = new byte[0];
     /**
      * 序列化对象
      * @param  obj 待序列化的对象

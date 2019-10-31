@@ -3,6 +3,7 @@ package com.jxin.rpc.core.call.msg.manage.impl;
 import com.jxin.rpc.core.call.msg.manage.AbstractReqManager;
 import com.jxin.rpc.core.call.msg.manage.RspFuture;
 import com.jxin.rpc.core.consts.ReqManagerEnum;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  * @version 1.0
  * @since 2019/10/22 15:38
  */
-
+@Slf4j
 public class AgentReqManager extends AbstractReqManager {
     /**背压机制, 最多同时执行100个任务*/
     private final Semaphore semaphore = new Semaphore(100);
@@ -58,6 +59,7 @@ public class AgentReqManager extends AbstractReqManager {
     protected void removeTimeoutFutures() {
         futureMap.entrySet().removeIf(entry -> {
             if(System.nanoTime() - entry.getValue().getTimestamp() > LOOP_TIME * 1000000000L){
+                log.warn("be removed req, requestId : " + entry.getKey());
                 semaphore.release();
                 return true;
             }

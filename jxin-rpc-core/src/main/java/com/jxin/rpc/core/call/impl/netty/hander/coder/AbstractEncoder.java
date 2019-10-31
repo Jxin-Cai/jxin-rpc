@@ -5,6 +5,7 @@ import com.jxin.rpc.core.call.msg.header.Header;
 import com.jxin.rpc.core.exc.CoderExc;
 import com.jxin.rpc.core.exc.RPCExc;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since jdk 1.8
  */
+
 public abstract class AbstractEncoder extends MessageToByteEncoder {
     /**
      * byteBuf的组成 :
