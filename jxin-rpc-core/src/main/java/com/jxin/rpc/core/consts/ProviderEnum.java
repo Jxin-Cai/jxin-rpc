@@ -22,6 +22,8 @@ public enum ProviderEnum {
     SERVER_PROVIDER("服务端提供者", 1),
     /**服务端注册服务提供者*/
     REGISTER_PROVIDER("服务端注册服务提供者", 2),
+    /**远程服务生成桩提供者*/
+    REMOTE_FEIGN_PROVIDER("远程服务生成桩提供者", 3),
     ;
 
     /**请求名称*/

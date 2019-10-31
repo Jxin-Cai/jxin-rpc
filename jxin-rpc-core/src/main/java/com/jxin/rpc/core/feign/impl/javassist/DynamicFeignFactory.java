@@ -2,10 +2,10 @@ package com.jxin.rpc.core.feign.impl.javassist;
 
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.SenderSub;
+import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.feign.FeignFactory;
 import com.jxin.rpc.core.proxy.impl.cglib.FeignProxy;
-import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import javassist.ClassPool;
 import javassist.CtClass;
 

@@ -1,1 +1,2 @@
-com.jxin.rpc.core.server.hander.impl.ServerProviderHander
+com.jxin.rpc.server.hander.impl.ServerProviderHander
+com.jxin.rpc.server.hander.impl.RegisterProviderHander

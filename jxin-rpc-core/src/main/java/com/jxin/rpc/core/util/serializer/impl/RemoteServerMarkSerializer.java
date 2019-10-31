@@ -1,22 +1,22 @@
 package com.jxin.rpc.core.util.serializer.impl;
 
+import com.jxin.rpc.core.call.msg.mark.RemoteServerMark;
 import com.jxin.rpc.core.consts.SerializerEnum;
 import com.jxin.rpc.core.exc.SerializeExc;
-import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.util.serializer.ProtoStuffUtil;
 import com.jxin.rpc.core.util.serializer.Serializer;
 
 import java.nio.ByteBuffer;
 
 /**
- * 服务标识列化实现类
+ * 服务标识列表序列化实现类
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/23 20:38
  */
-public class ServerMarkSerializer implements Serializer<ServerMark> {
+public class RemoteServerMarkSerializer implements Serializer<RemoteServerMark> {
     @Override
-    public void serialize(ServerMark obj, byte[] bytes, int offset, int length) {
+    public void serialize(RemoteServerMark obj, byte[] bytes, int offset, int length) {
         final ByteBuffer buffer = ByteBuffer.wrap(bytes, offset, length);
         final byte[] markByteArr = ProtoStuffUtil.serialize(obj);
         buffer.putInt(markByteArr.length);
@@ -24,21 +24,21 @@ public class ServerMarkSerializer implements Serializer<ServerMark> {
     }
 
     @Override
-    public ServerMark deserialize(byte[] bytes, int offset, int length) {
+    public RemoteServerMark deserialize(byte[] bytes, int offset, int length) {
         final ByteBuffer buffer = ByteBuffer.wrap(bytes, offset, length);
         final int markByteArrLen = buffer.getInt();
         final byte [] markByteArr = new byte[markByteArrLen];
         buffer.get(markByteArr);
-        final ServerMark serverMark = ProtoStuffUtil.deserialize(markByteArr, ServerMark.class);
+        final RemoteServerMark remoteServerMark = ProtoStuffUtil.deserialize(markByteArr, RemoteServerMark.class);
 
-        if(serverMark == null){
-            throw new SerializeExc("non null serverMark");
+        if(remoteServerMark == null){
+            throw new SerializeExc("non null remoteServerMark");
         }
-        return serverMark;
+        return remoteServerMark;
     }
 
     @Override
-    public Integer size(ServerMark obj) {
+    public Integer size(RemoteServerMark obj) {
         return ProtoStuffUtil.serialize(obj).length;
     }
 
@@ -48,7 +48,7 @@ public class ServerMarkSerializer implements Serializer<ServerMark> {
     }
 
     @Override
-    public Class<ServerMark> getObjectClass() {
-        return ServerMark.class;
+    public Class<RemoteServerMark> getObjectClass() {
+        return RemoteServerMark.class;
     }
 }

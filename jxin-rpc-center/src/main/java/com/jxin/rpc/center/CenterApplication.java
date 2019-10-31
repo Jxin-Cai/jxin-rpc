@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
 import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
-import com.jxin.rpc.center.server.impl.AgentCenterAccessPoint;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;

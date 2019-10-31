@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.scan;
+package com.jxin.rpc.server.scan;
 
 import java.util.List;
 import java.util.Map;

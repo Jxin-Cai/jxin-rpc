@@ -1,5 +1,6 @@
 package com.jxin.rpc.center.server.impl;
 
+import com.google.common.collect.Lists;
 import com.jxin.rpc.center.call.ForwordClient;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
 import com.jxin.rpc.center.feign.ForwordFeign;
@@ -11,13 +12,16 @@ import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.Server;
 import com.jxin.rpc.core.call.msg.MsgContext;
+import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.call.msg.header.ReqHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.RemoteServerMark;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.consts.ProVersionConsts;
 import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.core.feign.FeignFactory;
 import com.jxin.rpc.core.util.IdUtil;
+import com.jxin.rpc.core.util.serializer.SerializeUtil;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,6 +29,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +73,7 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
             log.error(e.getMessage(), e);
         }
     }
+
     //***********************************************addRemoteService***************************************************
     /**
      * 往 <code>CenterContext</code> 中添加远程服务转发feign实现
@@ -93,18 +99,10 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
                 log.error(e.getMessage(), e);
             }
         }
+        /*控制服务端生成 桩*/
+        createRemoteServiceFiegn(remoteServices);
     }
 
-    //***********************************************getLocalForwordFeign***********************************************
-    /**
-     * 获得本地请求跳转 桩
-     * @return 本地请求跳转 桩
-     * @author 蔡佳新
-     */
-    @Override
-    public ForwordFeign getLocalForwordFeign() {
-        return CENTER_CONTEXT.getLocalForwordFeign();
-    }
     //*************************************************startServer******************************************************
     /**
      * 启动服务
@@ -124,7 +122,7 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         registerCenter.registerService(applicationName, uri);
 
         // 生成本地客户端请求桩
-        final Sender localSender = createSender(uri, ServiceLoaderUtil.load(Client.class));
+        final Sender localSender = createSender(uri, CLIENT);
         CENTER_CONTEXT.setLocalForwordFeign(
                 FEIGN_FACTORY.createFeign(localSender,
                                           ForwordFeign.class,
@@ -161,7 +159,29 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
                              .pullRegisterService(reqMsgContext);
 
     }
+
     //*************************************private****addRemoteService**************************************************
+    private void createRemoteServiceFiegn(List<RemoteService> remoteServices){
+        final List<ServerMark> remoteServerList = Lists.newArrayList();
+        remoteServices.forEach(remoteService ->{
+            remoteService.getServiceList()
+                         .forEach(service -> remoteServerList.add(ServerMark.builder()
+                                                                            .interfaceName(service)
+                                                                            .build()));
+        });
+
+        final MsgContext reqMsgContext = MsgContext.builder()
+                                                   .header(ReqHeader.builder()
+                                                                    .requestId(IdUtil.getUUID())
+                                                                    .version(ProVersionConsts.VERSION_1)
+                                                                    .type(ProviderEnum.REMOTE_FEIGN_PROVIDER.getType())
+                                                                    .build())
+                                                   .body(SerializeUtil.serialize(RemoteServerMark.builder()
+                                                                                                 .remoteServerList(remoteServerList)
+                                                                                                 .build()))
+                                                   .build();
+        CENTER_CONTEXT.getLocalForwordFeign().pushRemoteService(reqMsgContext);
+    }
     /**
      * 创建服务的请求转发客户端 桩列表
      * @param  serviceUriList 服务的节点uri课表
@@ -220,6 +240,24 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         }
     }
 
+    //**************************************private****getLocalForwordFeign*********************************************
+    /**
+     * 获取注册中心的实现
+     * @param  serviceUri 注册中心URI
+     * @throws RegisterCenterExc 获取不到该协议的注册中心实现
+     * @return 注册中心的实现
+     * @author 蔡佳新
+     */
+    private RegisterCenter getRegisterCenter(URI serviceUri) {
+        final Collection<RegisterCenter> registerCenterList = ServiceLoaderUtil.loadAll(RegisterCenter.class);
+        for (RegisterCenter registerCenter : registerCenterList) {
+            if(registerCenter.schemeList().contains(serviceUri.getScheme())) {
+                registerCenter.connect(serviceUri);
+                return registerCenter;
+            }
+        }
+        throw new RegisterCenterExc("Unlawfulness scheme!");
+    }
     @Override
     public void close() throws IOException {
         if(server != null) {

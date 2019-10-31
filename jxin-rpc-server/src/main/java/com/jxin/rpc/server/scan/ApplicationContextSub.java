@@ -1,4 +1,4 @@
-package com.jxin.rpc.core.scan;
+package com.jxin.rpc.server.scan;
 
 /**
  * 应用上下文 订阅接口

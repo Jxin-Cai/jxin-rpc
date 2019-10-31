@@ -11,7 +11,6 @@ import com.jxin.rpc.core.util.serializer.SerializeUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 请求转发客户端 桩
@@ -50,6 +49,23 @@ public interface ForwordFeign {
             }
             final RspMsg rspMsg = SerializeUtil.parse(rspMsgContext.getBody());
             return (Map<String/*interfaceName*/, List<MethodMark>>)rspMsg.getReturnArg();
+        } catch (Exception e) {
+            throw new RPCExc(e);
+        }
+    }
+    /**
+     * 推送远程服务
+     * @param  reqMsgContext 请求消息上下文
+     * @throws RPCExc 请求异常
+     * @author 蔡佳新
+     */
+    default void pushRemoteService(MsgContext reqMsgContext)  {
+        try {
+            final MsgContext rspMsgContext = getSender().send(reqMsgContext).get();
+            final RspHeader rspHeader = (RspHeader) rspMsgContext.getHeader();
+            if(!RspStatusEnum.RES_CODE_200.getCode().equals(rspHeader.getCode())) {
+                throw new RPCExc(rspHeader.getErrMsg());
+            }
         } catch (Exception e) {
             throw new RPCExc(e);
         }

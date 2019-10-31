@@ -1,24 +1,38 @@
-package com.jxin.rpc.core.scan;
+package com.jxin.rpc.server.scan;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.jxin.rpc.core.call.Client;
+import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.ServerMark;
+import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.exc.ScanExc;
+import com.jxin.rpc.core.feign.FeignFactory;
+import com.jxin.rpc.core.inject.Autowired;
 import com.jxin.rpc.core.inject.RegistService;
 import com.jxin.rpc.core.inject.Service;
+import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 应用服务上下文
@@ -27,16 +41,33 @@ import java.util.Map;
  * @since 2019/10/24 15:59
  */
 @Slf4j
-public class ApplicationContext {
+public class ApplicationContext implements Closeable{
+    /**连接超时时间*/
+    private static final long CONNECTION_TIMEOUT = 30000L;
+
     /**全部服务上下文*/
     private Map<String/*serviceName*/, List<Object>/*serviceImplList*/> serviceContext = Maps.newHashMap();
     /**注册服务上下文*/
     private Map<String/*interfaceName*/, Object/*serviceImpl*/> registServiceContext = Maps.newHashMap();
     /**注册服务方法上下文*/
     private Map<String/*interfaceName*/, Map<MethodMark, Method>/*methodMap*/> registMethodContext = Maps.newHashMap();
+    /**远程服务的feign客户端*/
+    private Map<String/*interfaceName*/, Object/*interfaceFeign*/> remoteServiceContext;
 
+    /**桩(装)的工厂类*/
+    private static final FeignFactory FEIGN_FACTORY = ServiceLoaderUtil.load(FeignFactory.class);
+    /**客户端*/
+    private static final Client CLIENT =  ServiceLoaderUtil.load(Client.class);
+    /**本地请求代理端 消息发送器*/
+    private Sender localSender;
+    /**代理端的uri*/
+    private URI agentUri;
 
-    public ApplicationContext(String pkg) {
+    public ApplicationContext() {
+       super();
+    }
+    public ApplicationContext(String pkg, URI agentUri) {
+        this.agentUri = agentUri;
         // 扫包
         scanPackage(pkg);
         // 注入服务上下文
@@ -73,6 +104,71 @@ public class ApplicationContext {
         final Map<String/*interfaceName*/, List<MethodMark>> result = new HashMap<>(registMethodContext.size());
         registMethodContext.forEach((k,v) -> result.put(k, Lists.newArrayList(v.keySet())));
         return result;
+    }
+
+    /**
+     * 注入远程服务
+     * @param  serverMarkList 服务标识；列表
+     * @author 蔡佳新
+     */
+    public void injectRemoteService(List<ServerMark> serverMarkList) throws TimeoutException, InterruptedException {
+        if(localSender == null){
+            localSender = CLIENT.createSender(new InetSocketAddress(agentUri.getHost(), agentUri.getPort()),
+                                              CONNECTION_TIMEOUT);
+        }
+
+        this.remoteServiceContext = new HashMap<>(serverMarkList.size());
+        serverMarkList.forEach(serverMark -> {
+            try {
+                final Class<?> interfaceClass = Class.forName(serverMark.getInterfaceName());
+                final Object feign = FEIGN_FACTORY.createFeign(localSender, interfaceClass, serverMark);
+                remoteServiceContext.put(interfaceClass.getName(), feign);
+            } catch (ClassNotFoundException e) {
+                throw new InitFeignExc(e);
+            }
+        });
+        serviceContext.values().forEach(this::injectToService);
+    }
+
+    //***********************************************injectRemoteService************************************************
+    /**
+     * 为本地服务注入远程服务
+     * @param  serviceList 服务列表
+     * @author 蔡佳新
+     */
+    private void injectToService(List<Object> serviceList) {
+        serviceList.forEach(obj -> {
+            final Field[] declaredFields = obj.getClass().getDeclaredFields();
+            if(ArrayUtils.isEmpty(declaredFields)){
+                return;
+            }
+            Arrays.stream(declaredFields).forEach(field -> {
+                final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+                if(ArrayUtils.isEmpty(declaredAnnotations)){
+                    return;
+                }
+                final boolean needInject = Arrays.stream(declaredAnnotations).anyMatch(this::isAutowired);
+                if(!needInject){
+                    return;
+                }
+                final Object remoteService = remoteServiceContext.get(field.getDeclaringClass().getName());
+                try {
+                    field.set(obj, remoteService);
+                } catch (IllegalAccessException e) {
+                    throw new InitFeignExc(e);
+                }
+            });
+        });
+    }
+
+    /**
+     * 判断是不是 注入远程服务的注解
+     * @param  annotation 注解
+     * @return 如果是注入远程服务的注解返回 <code>true</code>
+     * @author 蔡佳新
+     */
+    private boolean isAutowired(Annotation annotation){
+        return annotation instanceof Autowired;
     }
     //***********************************************scanPackage********************************************************
     /**
@@ -243,5 +339,10 @@ public class ApplicationContext {
                          .methodName(methodName)
                          .argMarkArrStr(MethodMark.joinArgMarkArrToString(paramClassArr))
                          .build();
+    }
+
+    @Override
+    public void close() throws IOException {
+        CLIENT.close();
     }
 }
