@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.jxin.rpc.center.exc.RegisterCenterExc;
 import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
+import com.jxin.rpc.center.server.impl.AgentCenterAccessPoint;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -21,8 +22,10 @@ public class CenterApplication {
 
     public static void main(String[] args) throws InterruptedException {
         final AccessPoint accessPoint = ServiceLoaderUtil.load(AccessPoint.class);
-        accessPoint.startServer("jxin-client", 9999, 5555);
+        Runtime.getRuntime().addShutdownHook((AgentCenterAccessPoint)accessPoint);
         final File file = new File(getPath() + "application.properties");
+        accessPoint.startServer("jxin-client", file.toURI(), 9999, 5555);
+
         final List<RemoteService> remoteServices = mockRemoteServiceList();
         // 中添加远程服务转发feign实现
         accessPoint.addRemoteService(remoteServices, file.toURI());

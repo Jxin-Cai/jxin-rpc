@@ -52,15 +52,10 @@ public abstract class AbstractDecoder extends ByteToMessageDecoder {
         // 获得定长的字节数组用于接收body
         final byte [] body = new byte[length - header.length()];
         byteBuf.readBytes(body);
-
-        // 生成请求消息
-        if(header instanceof ReqHeader){
-            list.add(MsgContext.builder()
-                               .header(header)
-                               .body(body)
-                               .build());
-        }
-
+        list.add(MsgContext.builder()
+                           .header(header)
+                           .body(body)
+                           .build());
     }
 
     /**

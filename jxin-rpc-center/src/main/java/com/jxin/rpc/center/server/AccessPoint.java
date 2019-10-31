@@ -36,12 +36,13 @@ public interface AccessPoint extends Closeable {
     /**
      * 启动服务
      * @param  applicationName 服务名
+     * @param  serviceUri      注册中心URI
      * @param  clientPort      客户端端口号
      * @param  serverPort      服务端端口号
      * @throws InterruptedException 服务启动异常
      * @author 蔡佳新
      */
-    void startServer(String applicationName, int clientPort, int serverPort) throws InterruptedException;
+    void startServer(String applicationName, URI serviceUri, int clientPort, int serverPort) throws InterruptedException;
     /**
      * 获取注册中心的实现
      * @param  serviceUri 注册中心URI

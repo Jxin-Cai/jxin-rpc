@@ -34,6 +34,13 @@ public interface RegisterCenter extends Closeable {
      * @author 蔡佳新
      */
     void registerService(String application, URI uri);
+    /**
+     * 剔除注册的服务
+     * @param  application 服务名称
+     * @param  uri         服务地址
+     * @author 蔡佳新
+     */
+    void removeService(String application, URI uri);
 
     /**
      * 查询服务地址

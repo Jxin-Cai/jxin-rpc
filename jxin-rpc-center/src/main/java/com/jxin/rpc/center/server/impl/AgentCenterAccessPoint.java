@@ -19,6 +19,7 @@ import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.core.feign.FeignFactory;
 import com.jxin.rpc.core.util.IdUtil;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
@@ -28,13 +29,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 /**
  * 代理中心接入实现
  * @author 蔡佳新
  * @version 1.0
  * @since 2019/10/29 20:45
  */
-public class AgentCenterAccessPoint implements AccessPoint {
+@Slf4j
+public class AgentCenterAccessPoint extends Thread implements AccessPoint {
     /**连接超时时间*/
     private static final long CONNECTION_TIMEOUT = 30000L;
     /**空的字节码数组*/
@@ -51,6 +54,20 @@ public class AgentCenterAccessPoint implements AccessPoint {
     private static final FeignFactory FEIGN_FACTORY = ServiceLoaderUtil.load(FeignFactory.class);
     /**服务端*/
     private Server server = null;
+    /**当前服务的注册中心*/
+    private RegisterCenter registerCenter;
+    /*
+     * 继承Thread
+     * 用于在程序关闭时释放资源。
+     * @see java.lang.Thread#run()
+     */
+    public void run() {
+        try {
+            close();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     //***********************************************addRemoteService***************************************************
     /**
      * 往 <code>CenterContext</code> 中添加远程服务转发feign实现
@@ -60,9 +77,9 @@ public class AgentCenterAccessPoint implements AccessPoint {
      */
     @Override
     public void addRemoteService(List<RemoteService> remoteServices, URI serviceUri) {
-        final RegisterCenter registerCenter = getRegisterCenter(serviceUri);
+        final RegisterCenter serviceRegisterCenter = getRegisterCenter(serviceUri);
         remoteServices.forEach(remoteService ->{
-            final List<URI> serviceUriList = registerCenter.getService(remoteService.getApplicationName());
+            final List<URI> serviceUriList = serviceRegisterCenter.getService(remoteService.getApplicationName());
             assert CollectionUtils.isNotEmpty(serviceUriList) : "none register service : " + remoteService.getApplicationName();
             CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService.getApplicationName(),
                                                                     serviceUriList,
@@ -84,17 +101,22 @@ public class AgentCenterAccessPoint implements AccessPoint {
     /**
      * 启动服务
      * @param  applicationName 服务名
+     * @param  serviceUri      注册中心URI
      * @param  clientPort      客户端端口号
      * @param  serverPort      服务端端口号
      * @throws InterruptedException 服务启动异常
      * @author 蔡佳新
      */
     @Override
-    public void startServer(String applicationName, int clientPort, int serverPort) throws InterruptedException {
-        // 设置服务名
+    public void startServer(String applicationName, URI serviceUri, int clientPort, int serverPort) throws InterruptedException {
+        // 注册服务
         CENTER_CONTEXT.setApplicationName(applicationName);
+        registerCenter = getRegisterCenter(serviceUri);
+        final URI uri = URI.create("rpc://" + HOST + ":" + clientPort);
+        registerCenter.registerService(applicationName, uri);
+
         // 生成本地客户端请求桩
-        final Sender localSender = createSender(URI.create("rpc://" + HOST + ":" + clientPort), ServiceLoaderUtil.load(Client.class));
+        final Sender localSender = createSender(uri, ServiceLoaderUtil.load(Client.class));
         CENTER_CONTEXT.setLocalForwordFeign(
                 FEIGN_FACTORY.createFeign(localSender,
                                           ForwordFeign.class,
@@ -102,8 +124,10 @@ public class AgentCenterAccessPoint implements AccessPoint {
                                                     .application(CENTER_CONTEXT.getApplicationName())
                                                     .build())
         );
+
         // 拉取注册的服务
         CENTER_CONTEXT.setServiceContext(getRegisterService());
+        // 开启服务
         if (server == null) {
             server = ServiceLoaderUtil.load(Server.class);
             server.start(serverPort);
@@ -192,6 +216,9 @@ public class AgentCenterAccessPoint implements AccessPoint {
     public void close() throws IOException {
         if(server != null) {
             server.close();
+        }
+        if (registerCenter != null) {
+            registerCenter.close();
         }
         FORWORD_CLIENT.close();
         CLIENT.close();

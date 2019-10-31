@@ -32,8 +32,10 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
     private static final List<String> SCHEME_LIST = Lists.newArrayList("file");
     /**空的URI列表*/
     private static final List<URI> EMPTY_URI = Lists.newArrayList();
+    /**文件名*/
+    private static final String REGISTRATION_CENTER = "Registration Center";
     /**应用配置*/
-    private Properties appConfig = new Properties();
+    private final Properties appConfig = new Properties();
     /**配置文件地址*/
     private File configFile;
     /**定时任务执行线程池*/
@@ -61,9 +63,99 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
             throw new RegisterCenterExc("Unlawfulness scheme!");
         }
         configFile = new File(registerCenterUri);
+        if(!configFile.exists()){
+            try {
+                configFile.createNewFile();
+            } catch (IOException e) {
+                throw new RegisterCenterExc(e);
+            }
+        }
         load();
     }
 
+    @Override
+    public void registerService(String application, URI uri){
+        synchronized (appConfig){
+            final boolean needStore = addServiceUri(application, uri);
+            if(needStore){
+                store();
+            }
+        }
+    }
+
+    @Override
+    public void removeService(String application, URI uri) {
+        synchronized (appConfig){
+            removeServiceUri(application, uri);
+            store();
+        }
+    }
+
+    @Override
+    public List<URI> getService(String application){
+        final String uriListStr = appConfig.getProperty(application);
+        if(StringUtils.isBlank(uriListStr)){
+            load();
+            return EMPTY_URI;
+        }
+        return GsonUtil.GsonToList(uriListStr, URI.class);
+    }
+
+    /**
+     * 往注册中心添加该服务的uri
+     * @param  application 服务名
+     * @param  uri         uri
+     * @return 如果配置有变更则返回 true,需要序列化到文件
+     * @author 蔡佳新
+     */
+    private boolean addServiceUri(String application, URI uri) {
+        final String uriListStr = appConfig.getProperty(application);
+        if(StringUtils.isBlank(uriListStr)){
+            appConfig.setProperty(application, GsonUtil.GsonToStr(Lists.newArrayList(uri)));
+            return true;
+        }
+        final List<URI> uris = GsonUtil.GsonToList(uriListStr, URI.class);
+        if(uris.contains(uri)){
+            return false;
+
+        }
+        uris.add(uri);
+        appConfig.setProperty(application, GsonUtil.GsonToStr(uris));
+        return true;
+    }
+    /**
+     * 往注册中心删除该服务的uri
+     * @param  application 服务名
+     * @param  uri         uri
+     * @author 蔡佳新
+     */
+    private void removeServiceUri(String application, URI uri) {
+        final String uriListStr = appConfig.getProperty(application);
+        if(StringUtils.isBlank(uriListStr)){
+            return;
+        }
+        final List<URI> uris = GsonUtil.GsonToList(uriListStr, URI.class);
+        uris.remove(uri);
+        appConfig.setProperty(application, GsonUtil.GsonToStr(uris));
+    }
+    //******************************************private***common*******************************************************
+    /**
+     * 序列化配置到文件
+     * @author 蔡佳新
+     */
+    private void store() {
+        try (final RandomAccessFile raf = new RandomAccessFile(configFile, "rw");
+             final FileChannel fileChannel = raf.getChannel()) {
+            // final FileLock lock = fileChannel.lock();
+            try (final FileOutputStream fo = new FileOutputStream(configFile)) {
+                appConfig.store(fo, REGISTRATION_CENTER);
+            } finally {
+                // lock.release();
+            }
+        } catch (Exception e) {
+            throw new RegisterCenterExc(e);
+        }
+    }
     /**
      * 加载配置
      * @throws RegisterCenterExc 加载数据异常
@@ -78,45 +170,6 @@ public class LocalFileRegisterCenter implements RegisterCenter, Closeable {
             }
         }
     }
-
-
-
-    @Override
-    public void registerService(String application, URI uri){
-        synchronized (appConfig){
-            final String uriListStr = appConfig.getProperty(application);
-            if(StringUtils.isBlank(uriListStr)){
-                appConfig.setProperty(application, GsonUtil.GsonToStr(Lists.newArrayList(uri)));
-                return;
-            }
-            final List<URI> uris = GsonUtil.GsonToList(uriListStr, URI.class);
-            uris.add(uri);
-            appConfig.setProperty(application, GsonUtil.GsonToStr(uris));
-            try (final RandomAccessFile raf = new RandomAccessFile(configFile, "rw");
-                 final FileChannel fileChannel = raf.getChannel()){
-
-                final FileLock lock = fileChannel.lock();
-                try (final FileOutputStream fo = new FileOutputStream(configFile)){
-                    appConfig.store(fo, application);
-                }finally {
-                    lock.release();
-                }
-            }catch (Exception e){
-                throw new RegisterCenterExc(e);
-            }
-        }
-    }
-
-    @Override
-    public List<URI> getService(String application){
-        final String uriListStr = appConfig.getProperty(application);
-        if(StringUtils.isBlank(uriListStr)){
-            load();
-            return EMPTY_URI;
-        }
-        return GsonUtil.GsonToList(uriListStr, URI.class);
-    }
-
     @Override
     public void close(){
         scheduledFuture.cancel(true);

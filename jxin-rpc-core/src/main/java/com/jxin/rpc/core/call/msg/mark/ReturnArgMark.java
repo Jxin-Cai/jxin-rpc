@@ -2,6 +2,7 @@ package com.jxin.rpc.core.call.msg.mark;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 返回参数标识
@@ -16,4 +17,13 @@ public class ReturnArgMark {
     private String classMark;
     /**返回的数据是列表还是单体, true为是列表*/
     private boolean multi;
+
+    public ReturnArgMark() {
+        super();
+    }
+
+    public ReturnArgMark(String classMark, boolean multi) {
+        this.classMark = classMark;
+        this.multi = multi;
+    }
 }

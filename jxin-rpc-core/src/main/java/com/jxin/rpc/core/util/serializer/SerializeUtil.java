@@ -3,6 +3,7 @@ package com.jxin.rpc.core.util.serializer;
 import com.jxin.rpc.core.consts.SerializerEnum;
 import com.jxin.rpc.core.exc.SerializeExc;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * 序列化工具

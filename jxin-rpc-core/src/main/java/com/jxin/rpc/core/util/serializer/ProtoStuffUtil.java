@@ -72,7 +72,7 @@ public class ProtoStuffUtil {
             result = clazz.newInstance();
             ProtostuffIOUtil.mergeFrom(objByteArr, result, RuntimeSchema.getSchema(clazz));
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new SerializeExc(e, "单对象反序列化失败, clazz:{}", clazz.getCanonicalName());
+            throw new SerializeExc(e, "单对象反序列化失败, clazz:%s", clazz.getCanonicalName());
         }
         return result;
     }
@@ -100,7 +100,7 @@ public class ProtoStuffUtil {
                                          buffer);
             result = bos.toByteArray();
         } catch (Exception e) {
-            throw new SerializeExc(e, "多对象序列化失败, obj:{}", GsonUtil.GsonToStr(obj));
+            throw new SerializeExc(e, "多对象序列化失败, obj:%s", GsonUtil.GsonToStr(obj));
         }finally {
             buffer.clear();
         }
@@ -128,7 +128,7 @@ public class ProtoStuffUtil {
         try {
             result = ProtostuffIOUtil.parseListFrom(new ByteArrayInputStream(objByteArr), schema);
         } catch (IOException e) {
-            throw new SerializeExc(e, "多对象反序列化失败, clazz:{}", clazz.getCanonicalName());
+            throw new SerializeExc(e, "多对象反序列化失败, clazz:%s", clazz.getCanonicalName());
         }
         return result;
     }
