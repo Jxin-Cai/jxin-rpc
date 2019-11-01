@@ -2,9 +2,9 @@ package com.jxin.rpc.center.feign;
 
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.MsgContext;
-import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.call.msg.header.RspHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.RegisterServerMark;
 import com.jxin.rpc.core.consts.RspStatusEnum;
 import com.jxin.rpc.core.exc.RPCExc;
 import com.jxin.rpc.core.util.serializer.SerializeUtil;
@@ -42,13 +42,13 @@ public interface ForwordFeign {
      */
     default Map<String/*interfaceName*/, List<MethodMark>> pullRegisterService(MsgContext reqMsgContext)  {
         try {
-            final MsgContext rspMsgContext =  getSender().send(reqMsgContext).get();
+            final MsgContext rspMsgContext = getSender().send(reqMsgContext).get();
             final RspHeader rspHeader = (RspHeader) rspMsgContext.getHeader();
             if(!RspStatusEnum.RES_CODE_200.getCode().equals(rspHeader.getCode())) {
                 throw new RPCExc(rspHeader.getErrMsg());
             }
-            final RspMsg rspMsg = SerializeUtil.parse(rspMsgContext.getBody());
-            return (Map<String/*interfaceName*/, List<MethodMark>>)rspMsg.getReturnArg();
+            final RegisterServerMark registerServerMark = SerializeUtil.parse(rspMsgContext.getBody());
+            return registerServerMark.getRegisterServiceMap();
         } catch (Exception e) {
             throw new RPCExc(e);
         }

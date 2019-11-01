@@ -6,18 +6,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * 远程服务标示
+ * 注册的服务标识
  * @author 蔡佳新
  * @version 1.0
- * @since 2019/10/31 20:43
+ * @since 2019/11/1 11:31
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RemoteServerMark {
-    /**远程服务列表*/
-    private List<ServerMark> remoteServerList;
+public class RegisterServerMark {
+    /**注册的服务容器*/
+    private Map<String/*interfaceName*/, List<MethodMark>> registerServiceMap;
+
 }

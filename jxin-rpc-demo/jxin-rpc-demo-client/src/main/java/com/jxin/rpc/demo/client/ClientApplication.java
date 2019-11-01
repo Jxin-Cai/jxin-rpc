@@ -1,7 +1,9 @@
 package com.jxin.rpc.demo.client;
 
-import com.jxin.rpc.core.call.Server;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
+import com.jxin.rpc.server.ServerStartPoint;
+
+import java.io.IOException;
 
 /**
  * 中心启动类
@@ -13,8 +15,9 @@ public class ClientApplication {
 
 
     public static void main(String[] args) throws InterruptedException {
-        final Server server = ServiceLoaderUtil.load(Server.class);
-        server.start(9999);
+        final ServerStartPoint serverStartPoint = ServiceLoaderUtil.load(ServerStartPoint.class);
+        Runtime.getRuntime().addShutdownHook((Thread)serverStartPoint);
+        serverStartPoint.startServer(5555, 9999);
     }
 
 

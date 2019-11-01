@@ -57,7 +57,7 @@ public class ApplicationContext implements Closeable{
     /**桩(装)的工厂类*/
     private static final FeignFactory FEIGN_FACTORY = ServiceLoaderUtil.load(FeignFactory.class);
     /**客户端*/
-    private static final Client CLIENT =  ServiceLoaderUtil.load(Client.class);
+    private Client client;
     /**本地请求代理端 消息发送器*/
     private Sender localSender;
     /**代理端的uri*/
@@ -74,6 +74,7 @@ public class ApplicationContext implements Closeable{
         injectServiceContext();
         // 往methodContext中添加 所有服务实例的所有方法
         putAllMethod();
+        client = ServiceLoaderUtil.load(Client.class);
     }
 
     /**
@@ -113,7 +114,7 @@ public class ApplicationContext implements Closeable{
      */
     public void injectRemoteService(List<ServerMark> serverMarkList) throws TimeoutException, InterruptedException {
         if(localSender == null){
-            localSender = CLIENT.createSender(new InetSocketAddress(agentUri.getHost(), agentUri.getPort()),
+            localSender = client.createSender(new InetSocketAddress(agentUri.getHost(), agentUri.getPort()),
                                               CONNECTION_TIMEOUT);
         }
 
@@ -179,7 +180,9 @@ public class ApplicationContext implements Closeable{
     private void scanPackage(final String pkg){
         final String pkgDirPath = pkg.replaceAll("\\.", "/");
         final URL url = getClass().getClassLoader().getResource(pkgDirPath);
-        assert url != null;
+        if(url == null){
+            return;
+        }
         final File pkgDir = new File(url.getFile());
         final File[] fs = pkgDir.listFiles(file -> {
             // 文件夹过滤掉,递归进去扫
@@ -343,6 +346,6 @@ public class ApplicationContext implements Closeable{
 
     @Override
     public void close() throws IOException {
-        CLIENT.close();
+        client.close();
     }
 }

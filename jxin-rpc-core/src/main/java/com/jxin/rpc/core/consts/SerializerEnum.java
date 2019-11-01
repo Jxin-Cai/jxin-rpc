@@ -3,6 +3,7 @@ package com.jxin.rpc.core.consts;
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.call.msg.RspMsg;
+import com.jxin.rpc.core.call.msg.mark.RegisterServerMark;
 import com.jxin.rpc.core.call.msg.mark.RemoteServerMark;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.util.serializer.Serializer;
@@ -27,8 +28,10 @@ public enum SerializerEnum {
     RSP_MSG("返回消息", 2, RspMsg.class),
     /**服务标识*/
     SERVER_MARK("服务标示", 3, ServerMark.class),
+    /**注册服务标示*/
+    REGISTER_SERVER_MARK("注册服务标示", 4, RegisterServerMark.class),
     /**远程服务标示*/
-    REMOTE_SERVER_MARK("远程服务标示", 4, RemoteServerMark.class),
+    REMOTE_SERVER_MARK("远程服务标示", 5, RemoteServerMark.class),
     ;
 
     /**序列化器名称*/

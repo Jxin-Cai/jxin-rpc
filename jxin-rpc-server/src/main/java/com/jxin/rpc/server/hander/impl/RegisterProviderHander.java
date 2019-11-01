@@ -5,6 +5,7 @@ import com.jxin.rpc.core.call.msg.RspMsg;
 import com.jxin.rpc.core.call.msg.header.Header;
 import com.jxin.rpc.core.call.msg.header.RspHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
+import com.jxin.rpc.core.call.msg.mark.RegisterServerMark;
 import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
 import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.core.consts.RspStatusEnum;
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.jxin.rpc.core.util.serializer.Serializer.EMPTY_BYTE_ARR;
 
 /**
  * 服务端提供者执行器
@@ -36,22 +39,20 @@ public class RegisterProviderHander implements ProviderHander, ApplicationContex
         }
         final Map<String, List<MethodMark>> allService = applicationContext.getAllService();
 
-        return createMsgContext(header, allService);
+        return createMsgContext(header, RegisterServerMark.builder()
+                                                          .registerServiceMap(allService)
+                                                          .build());
     }
 
     /**
      * 创建响应消息上下文
-     * @param  header    请求头
-     * @param  returnObj 返回参数
+     * @param  header             请求头
+     * @param  registerServerMark 注册的服务标识
      * @return 响应消息上下文
      * @author 蔡佳新
      */
     private MsgContext createMsgContext(Header header,
-                                        Object returnObj) {
-        final ReturnArgMark returnArgMark = ReturnArgMark.builder()
-                                                         .multi(false)
-                                                         .classMark(ArgMarkUtil.getMark(returnObj == null? Object.class : returnObj.getClass()))
-                                                         .build();
+                                        RegisterServerMark registerServerMark) {
         return MsgContext.builder()
                          .header(RspHeader.builder()
                                           .type(type())
@@ -59,10 +60,7 @@ public class RegisterProviderHander implements ProviderHander, ApplicationContex
                                           .requestId(header.getRequestId())
                                           .code(RspStatusEnum.RES_CODE_200.getCode())
                                           .build())
-                         .body(SerializeUtil.serialize(RspMsg.builder()
-                                                             .returnArgMark(returnArgMark)
-                                                             .returnArg(returnObj)
-                                                             .build()))
+                         .body(registerServerMark == null? EMPTY_BYTE_ARR : SerializeUtil.serialize(registerServerMark))
                          .build();
     }
 

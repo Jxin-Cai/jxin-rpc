@@ -9,7 +9,6 @@ import com.jxin.rpc.server.scan.ApplicationContext;
 import com.jxin.rpc.server.scan.ApplicationContextSub;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 
@@ -20,7 +19,7 @@ import java.net.URI;
  * @since 2019/10/31 17:52
  */
 @Slf4j
-public class LocalServerStartPoint extends Thread implements ServerStartPoint, Closeable {
+public class LocalServerStartPoint extends Thread implements ServerStartPoint {
 
     /**host*/
     private static final String HOST = "localhost";
@@ -70,6 +69,9 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint, C
         if(server != null) {
             server.close();
         }
-        applicationContext.close();
+        if(applicationContext != null){
+            applicationContext.close();
+        }
+
     }
 }
