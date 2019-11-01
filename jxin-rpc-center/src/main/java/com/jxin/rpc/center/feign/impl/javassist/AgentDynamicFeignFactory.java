@@ -5,6 +5,9 @@ import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.feign.FeignFactory;
 import javassist.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 
 /**
  * 桩(装)工厂类 javassist框架实现类
@@ -22,12 +25,13 @@ public class AgentDynamicFeignFactory implements FeignFactory {
         final ClassPool pool = ClassPool.getDefault();
         final Object obj;
         try {
+
+            // 1. 创建一个空类
+            final CtClass ccFeign = pool.makeClass(INSTANCE_CLASS_PKG_PATH + "." + feignName);
             // Sender的字节码对象
             final CtClass ctClass = pool.get("com.jxin.rpc.core.call.Sender");
             // 空字节码对象数组
             final CtClass[] emptyClassArr = {};
-            // 1. 创建一个空类
-            final CtClass ccFeign = pool.makeClass(INSTANCE_CLASS_PKG_PATH + "." + feignName);
             // 2. 新增一个字段 private Sender sender;
             final CtField param = new CtField(ctClass, "sender", ccFeign);
             param.setModifiers(Modifier.PRIVATE);
@@ -43,7 +47,7 @@ public class AgentDynamicFeignFactory implements FeignFactory {
             ccFeign.addConstructor(cons);
             // 5. 获取接口
             final CtClass ccInterface = pool.getCtClass(insterface.getName());
-            ccFeign.setInterfaces(new CtClass[]{ccInterface});
+            ccFeign.addInterface(ccInterface);
             // 6. 创建一个名为printName方法，无参数，无返回值，输出name值
             CtMethod ctMethod = new CtMethod(ctClass, "getSender", emptyClassArr, ccFeign);
             ctMethod.setModifiers(Modifier.PUBLIC);
@@ -67,11 +71,28 @@ public class AgentDynamicFeignFactory implements FeignFactory {
      * @author 蔡佳新
      */
     private String upperCase(String str) {
+        if (StringUtils.isBlank(str)) {
+            return str;
+        }
         final char[] ch = str.toCharArray();
         if (ch[0] >= 'a' && ch[0] <= 'z') {
             ch[0] = (char) (ch[0] - 32);
         }
-        return new String(ch);
+        int len = ch.length;
+        for (int i = 0; i < len; i++) {
+            if (isLetter(ch[i])) {
+                continue;
+            }
+            for (int j = i; j < len - 1; j++) {
+                ch[j] = ch[j + 1];
+            }
+            len--;
+        }
+       return new String(ch,0,len);
+    }
+
+    private boolean isLetter(char ch) {
+        return (64 <= ch && ch <= 90) || (96 <= ch && ch <= 122);
     }
 
 }

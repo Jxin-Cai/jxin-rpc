@@ -28,6 +28,7 @@ public class CenterApplication {
             Runtime.getRuntime().addShutdownHook((Thread)accessPoint);
             final File file = new File(getPath() + "application.properties");
             accessPoint.startServer("jxin-client", file.toURI(), 9999, 5555);
+            //accessPoint.startServer("jxin-service", file.toURI(), 8888, 4444);
 
             final List<RemoteService> remoteServices = mockRemoteServiceList();
             // 中添加远程服务转发feign实现
@@ -50,7 +51,7 @@ public class CenterApplication {
         final List<RemoteService> result = Lists.newArrayList();
         final RemoteService remoteService = RemoteService.builder()
                                                          .applicationName("jxin-service")
-                                                         .serviceList(Lists.newArrayList(""))
+                                                         .serviceList(Lists.newArrayList("com.jxin.rpc.demo.api.HelloWord"))
                                                          .build();
         result.add(remoteService);
         return result;

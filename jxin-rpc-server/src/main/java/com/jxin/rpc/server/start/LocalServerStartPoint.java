@@ -23,7 +23,7 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint {
 
     /**host*/
     private static final String HOST = "localhost";
-    private static final String PKG = "";
+    private static final String PKG = "com.jxin.rpc";
     /**服务端*/
     private Server server = null;
     /**应用服务上下文*/
@@ -48,6 +48,8 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint {
         initProviderHander(ProviderEnum.SERVER_PROVIDER);
         // 服务端注册服务提供者
         initProviderHander(ProviderEnum.REGISTER_PROVIDER);
+        // 远程服务生成桩提供者
+        initProviderHander(ProviderEnum.REMOTE_FEIGN_PROVIDER);
         // 开启服务
         if (server == null) {
             server = ServiceLoaderUtil.load(Server.class);
@@ -59,7 +61,7 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint {
      * @param  providerEnum       服务提供者枚举类
      * @author 蔡佳新
      */
-    private void initProviderHander( ProviderEnum providerEnum) {
+    private void initProviderHander(ProviderEnum providerEnum) {
         final ProviderHander providerHander = ProviderEnum.getByType(providerEnum.getType());
         ((ApplicationContextSub) providerHander).setApplicationContext(applicationContext);
     }

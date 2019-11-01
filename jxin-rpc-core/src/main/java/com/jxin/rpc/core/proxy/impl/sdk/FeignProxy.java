@@ -1,5 +1,6 @@
 package com.jxin.rpc.core.proxy.impl.sdk;
 
+import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.proxy.AbstractFeignProxy;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 
@@ -18,13 +19,16 @@ public class FeignProxy extends AbstractFeignProxy implements InvocationHandler{
      * 获取代理类
      * @param  clazz      类的字节码对象
      * @param  serverMark 服务标识
+     * @param  sender     消息发送器
      * @return 代理类实例
      * @author 蔡佳新
      */
     @Override
     public Object getProxy(Class<?> clazz,
-                           ServerMark serverMark) {
+                           ServerMark serverMark,
+                           Sender sender) {
         super.serverMark = serverMark;
+        super.sender = sender;
         return Proxy.newProxyInstance(FeignProxy.class.getClassLoader(),
                                       clazz.getInterfaces(),
                                      this);

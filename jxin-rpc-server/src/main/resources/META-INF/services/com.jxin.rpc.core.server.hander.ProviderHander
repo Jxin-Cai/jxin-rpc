@@ -1,2 +1,3 @@
 com.jxin.rpc.server.hander.impl.ServerProviderHander
 com.jxin.rpc.server.hander.impl.RegisterProviderHander
+com.jxin.rpc.server.hander.impl.RemoteFeignProviderHander

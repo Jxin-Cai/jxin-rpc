@@ -2,7 +2,6 @@ package com.jxin.rpc.core.proxy;
 
 import com.google.common.collect.Maps;
 import com.jxin.rpc.core.call.Sender;
-import com.jxin.rpc.core.call.SenderSub;
 import com.jxin.rpc.core.call.msg.MsgContext;
 import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.call.msg.RspMsg;
@@ -28,7 +27,7 @@ import java.util.Map;
  * @since jdk 1.8
  */
 @Slf4j
-public abstract class AbstractFeignProxy implements SenderSub {
+public abstract class AbstractFeignProxy{
     /**服务标识*/
     protected ServerMark serverMark;
     /**方法标识 map*/
@@ -40,11 +39,13 @@ public abstract class AbstractFeignProxy implements SenderSub {
      * 获取代理类
      * @param  clazz      类的字节码对象
      * @param  serverMark 服务标识
+     * @param  sender     消息发送器
      * @return 代理类实例
      * @author 蔡佳新
      */
     public abstract Object getProxy(Class<?> clazz,
-                                    ServerMark serverMark) ;
+                                    ServerMark serverMark,
+                                    Sender sender) ;
 
     /**
      * 远程调用真逻辑
@@ -125,8 +126,4 @@ public abstract class AbstractFeignProxy implements SenderSub {
                          .build();
     }
 
-    @Override
-    public void setSender(Sender sender) {
-        this.sender = sender;
-    }
 }

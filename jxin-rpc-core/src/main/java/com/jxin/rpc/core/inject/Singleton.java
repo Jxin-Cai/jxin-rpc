@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2019/10/21 20:21
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Singleton {
 }

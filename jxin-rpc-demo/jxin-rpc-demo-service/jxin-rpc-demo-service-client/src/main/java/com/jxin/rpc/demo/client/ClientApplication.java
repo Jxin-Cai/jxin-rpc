@@ -3,8 +3,6 @@ package com.jxin.rpc.demo.client;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import com.jxin.rpc.server.ServerStartPoint;
 
-import java.io.IOException;
-
 /**
  * 中心启动类
  * @author 蔡佳新

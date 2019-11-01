@@ -3,6 +3,7 @@ package com.jxin.rpc.center.register;
 import lombok.Builder;
 import lombok.Data;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -18,4 +19,6 @@ public class RemoteService {
     private String applicationName;
     /**服务列表*/
     private List<String/*interface*/> serviceList;
+    /**服务uril列表*/
+    private List<URI> serviceUriList;
 }

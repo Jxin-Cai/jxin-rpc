@@ -33,8 +33,7 @@ public class RemoteFeignProviderHander implements ProviderHander, ApplicationCon
     public MsgContext handle(MsgContext msg) {
         final Header header = msg.getHeader();
         // 从body中反序列化出reqMsg
-        final ReqMsg reqMsg = SerializeUtil.parse(msg.getBody());
-        final RemoteServerMark remoteServerMark = (RemoteServerMark)reqMsg.getArgArr()[0];
+        final RemoteServerMark remoteServerMark = SerializeUtil.parse(msg.getBody());
         if(remoteServerMark == null || CollectionUtils.isEmpty(remoteServerMark.getRemoteServerList())){
             return createMsgContext(header, null);
         }

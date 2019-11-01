@@ -1,13 +1,14 @@
 package com.jxin.rpc.core.feign.impl.javassist;
 
 import com.jxin.rpc.core.call.Sender;
-import com.jxin.rpc.core.call.SenderSub;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.feign.FeignFactory;
 import com.jxin.rpc.core.proxy.impl.cglib.FeignProxy;
 import javassist.ClassPool;
 import javassist.CtClass;
+
+import java.lang.reflect.Method;
 
 /**
  * 桩(装)工厂类 javassist框架实现类
@@ -39,11 +40,7 @@ public class DynamicFeignFactory implements FeignFactory {
         } catch (Exception e) {
             throw new InitFeignExc(e);
         }
-
-        final SenderSub senderSub = (SenderSub) new FeignProxy().getProxy(clazz, serverMark);
-        // 把sender赋值给桩
-        senderSub.setSender(sender);
         // 返回这个桩
-        return (T) senderSub;
+        return (T) new FeignProxy().getProxy(clazz, serverMark, sender);
     }
 }

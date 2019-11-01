@@ -3,20 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>jxin-rpc</artifactId>
+        <artifactId>jxin-rpc-demo</artifactId>
         <groupId>com.framework.jxin</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.framework.jxin</groupId>
-    <artifactId>jxin-rpc-demo</artifactId>
+    <artifactId>jxin-rpc-demo-api</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>jxin-rpc-demo-client</module>
-        <module>jxin-rpc-demo-api</module>
-        <module>jxin-rpc-demo-service</module>
+        <module>jxin-rpc-demo-api-server</module>
     </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>com.framework.jxin</groupId>
+            <artifactId>jxin-rpc-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>

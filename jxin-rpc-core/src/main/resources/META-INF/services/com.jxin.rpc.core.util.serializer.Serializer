@@ -3,3 +3,4 @@ com.jxin.rpc.core.util.serializer.impl.ServerMarkSerializer
 com.jxin.rpc.core.util.serializer.impl.RspMsgSerializer
 com.jxin.rpc.core.util.serializer.impl.ReqMsgSerializer
 com.jxin.rpc.core.util.serializer.impl.RegisterServerMarkSerializer
+com.jxin.rpc.core.util.serializer.impl.RemoteServerMarkSerializer

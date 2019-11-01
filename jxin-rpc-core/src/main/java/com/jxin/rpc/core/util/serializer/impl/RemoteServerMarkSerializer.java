@@ -44,7 +44,7 @@ public class RemoteServerMarkSerializer implements Serializer<RemoteServerMark> 
 
     @Override
     public Integer getType() {
-        return SerializerEnum.SERVER_MARK.getType();
+        return SerializerEnum.REMOTE_SERVER_MARK.getType();
     }
 
     @Override

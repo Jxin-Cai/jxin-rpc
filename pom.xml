@@ -54,6 +54,22 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.framework.jxin</groupId>
+                <artifactId>jxin-rpc-core</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.framework.jxin</groupId>
+                <artifactId>jxin-rpc-server</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.framework.jxin</groupId>
+                <artifactId>jxin-rpc-demo-api-server</artifactId>
+                <version>${version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>

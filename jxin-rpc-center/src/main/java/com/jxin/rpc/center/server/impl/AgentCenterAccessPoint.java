@@ -12,7 +12,6 @@ import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.Server;
 import com.jxin.rpc.core.call.msg.MsgContext;
-import com.jxin.rpc.core.call.msg.ReqMsg;
 import com.jxin.rpc.core.call.msg.header.ReqHeader;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import com.jxin.rpc.core.call.msg.mark.RemoteServerMark;
@@ -87,9 +86,9 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         try {
             remoteServices.forEach(remoteService ->{
                 final List<URI> serviceUriList = serviceRegisterCenter.getService(remoteService.getApplicationName());
+                remoteService.setServiceUriList(serviceUriList);
                 assert CollectionUtils.isNotEmpty(serviceUriList) : "none register service : " + remoteService.getApplicationName();
-                CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService.getApplicationName(),
-                                                                        serviceUriList,
+                CENTER_CONTEXT.computeIfAbsentToApplicationFeignListMap(remoteService,
                                                                         this::createForwordFeignListToApp);
             });
         }finally {
@@ -184,28 +183,20 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
     }
     /**
      * 创建服务的请求转发客户端 桩列表
-     * @param  serviceUriList 服务的节点uri课表
+     * @param  remoteService 订阅的远程服务实例
      * @return 消息发送器
      * @author 蔡佳新
      */
-    private List<ForwordFeign> createForwordFeignListToApp(List<URI> serviceUriList) {
-        return serviceUriList.stream()
-                             .map(this::addRemoteService)
-                             .collect(Collectors.toList());
-    }
-    /**
-     * 客户端获取远程服务的引用
-     * @param  uri 远程服务地址
-     * @return 远程服务引用
-     * @author 蔡佳新
-     */
-    private ForwordFeign addRemoteService(URI uri) {
-        return FEIGN_FACTORY.createFeign(putToSenderMap(uri),
-                                         ForwordFeign.class,
-                                         ServerMark.builder()
-                                                   .application(CENTER_CONTEXT.getApplicationName())
-                                                   .interfaceName(ForwordFeign.class.getName())
-                                                   .build());
+    private List<ForwordFeign> createForwordFeignListToApp(RemoteService remoteService) {
+        return remoteService.getServiceUriList()
+                            .stream()
+                            .map(uri -> FEIGN_FACTORY.createFeign(putToSenderMap(uri),
+                                        ForwordFeign.class,
+                                        ServerMark.builder()
+                                                  .application(remoteService.getApplicationName())
+                                                  .interfaceName(ForwordFeign.class.getName())
+                                                  .build()))
+                            .collect(Collectors.toList());
     }
     /**
      * 如果key在容器中无值,则往<code>senderMap</code>中添加sender

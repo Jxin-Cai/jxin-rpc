@@ -220,8 +220,8 @@ public class ApplicationContext implements Closeable{
     private void putService(Object obj) {
         final Class<?> clazz = obj.getClass();
         for (Class<?> interfaceClass : clazz.getInterfaces()) {
-            final AnnotatedType[] annotatedInterfaces = interfaceClass.getAnnotatedInterfaces();
-            if(Arrays.stream(annotatedInterfaces).anyMatch(this::isRegistService)){
+            final Annotation[] annotations = interfaceClass.getAnnotations();
+            if(Arrays.stream(annotations).anyMatch(this::isRegistService)){
                 registServiceContext.put(interfaceClass.getName(), obj);
             }
         }
@@ -230,12 +230,12 @@ public class ApplicationContext implements Closeable{
 
     /**
      * 判断注解是不是 {@link RegistService}的实例
-     * @param  annotated 注解
+     * @param  annotation 注解
      * @return 如果注解是 {@link RegistService}的实例则返回 true
      * @author 蔡佳新
      */
-    private boolean isRegistService(AnnotatedType annotated) {
-        return annotated instanceof RegistService;
+    private boolean isRegistService(Annotation annotation) {
+        return annotation instanceof RegistService;
     }
 
     /**

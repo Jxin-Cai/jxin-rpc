@@ -7,6 +7,6 @@ import com.jxin.rpc.core.feign.IFeign;
  * @version 1.0
  * @since jdk 1.8
  */
-public class Feign implements IFeign {
+public abstract class Feign implements IFeign {
 
 }

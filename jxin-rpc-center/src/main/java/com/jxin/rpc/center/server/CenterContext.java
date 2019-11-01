@@ -3,6 +3,7 @@ package com.jxin.rpc.center.server;
 import com.google.common.collect.Maps;
 import com.jxin.rpc.center.feign.ForwordFeign;
 import com.jxin.rpc.center.register.RegisterCenter;
+import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.mark.MethodMark;
 import lombok.Builder;
@@ -59,19 +60,17 @@ public class CenterContext  {
     /**
      * (函数式编程)
      * 如果key在容器中无值,则往<code>applicationFeignListMap</code>中添加application
-     * @param  applicationName 服务名
-     * @param  serviceUriList  服务的节点uri课表
+     * @param  remoteService   订阅的远程服务实例
      * @param  mappingFunction 要执行的方法
      * @author 蔡佳新
      */
-    public void computeIfAbsentToApplicationFeignListMap(String applicationName,
-                                                         List<URI> serviceUriList,
-                                                         Function<List<URI>, List<ForwordFeign>> mappingFunction) {
+    public void computeIfAbsentToApplicationFeignListMap(RemoteService remoteService,
+                                                         Function<RemoteService, List<ForwordFeign>> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
         final List<ForwordFeign> forwordFeigns = this.applicationFeignListMap.get(applicationName);
         if (CollectionUtils.isNotEmpty(forwordFeigns)) {
            return;
         }
-        this.applicationFeignListMap.put(applicationName, mappingFunction.apply(serviceUriList));
+        this.applicationFeignListMap.put(applicationName, mappingFunction.apply(remoteService));
     }
 }
