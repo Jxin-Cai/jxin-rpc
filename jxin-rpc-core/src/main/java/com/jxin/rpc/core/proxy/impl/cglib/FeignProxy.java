@@ -25,7 +25,7 @@ public class FeignProxy extends AbstractFeignProxy implements MethodInterceptor 
      * @author 蔡佳新
      */
     @Override
-    public Object getProxy(Class<?> clazz,
+    public <T> T getProxy(Class<T> clazz,
                            ServerMark serverMark,
                            Sender sender) {
         super.serverMark = serverMark;
@@ -36,7 +36,7 @@ public class FeignProxy extends AbstractFeignProxy implements MethodInterceptor 
         enhancer.setSuperclass(clazz);
         // 定义代理逻辑对象为当前对象，要求当前对象实现MethodInterceptor方法
         enhancer.setCallback(this);
-        return enhancer.create();
+        return (T)enhancer.create();
     }
     @Override
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) {

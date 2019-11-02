@@ -67,10 +67,10 @@ public class CenterContext  {
     public void computeIfAbsentToApplicationFeignListMap(RemoteService remoteService,
                                                          Function<RemoteService, List<ForwordFeign>> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
-        final List<ForwordFeign> forwordFeigns = this.applicationFeignListMap.get(applicationName);
+        final List<ForwordFeign> forwordFeigns = this.applicationFeignListMap.get(remoteService.getApplicationName());
         if (CollectionUtils.isNotEmpty(forwordFeigns)) {
            return;
         }
-        this.applicationFeignListMap.put(applicationName, mappingFunction.apply(remoteService));
+        this.applicationFeignListMap.put(remoteService.getApplicationName(), mappingFunction.apply(remoteService));
     }
 }

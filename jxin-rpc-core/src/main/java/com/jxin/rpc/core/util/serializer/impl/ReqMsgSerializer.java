@@ -66,7 +66,7 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
         // argArr
         final String argMarkArrStr = methodMark.getArgMarkArrStr();
         if(StringUtils.isBlank(argMarkArrStr)){
-            return ReqMsg.builder().serverMark(serverMark).build();
+            return ReqMsg.builder().serverMark(serverMark).methodMark(methodMark).build();
         }
 
         final String[] argMarArr = argMarkArrStr.split(",");
@@ -90,7 +90,8 @@ public class ReqMsgSerializer implements Serializer<ReqMsg> {
 
     @Override
     public Integer size(ReqMsg obj) {
-        final int serverMarkLen = Integer.BYTES + ProtoStuffUtil.serialize(obj.getServerMark()).length;
+        final int serverMarkLen = Integer.BYTES + ProtoStuffUtil.serialize(obj.getServerMark()).length
+                                  +  Integer.BYTES + ProtoStuffUtil.serialize(obj.getMethodMark()).length;
         if(ArrayUtils.isEmpty(obj.getArgArr())){
             return serverMarkLen;
         }

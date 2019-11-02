@@ -24,14 +24,14 @@ public class FeignProxy extends AbstractFeignProxy implements InvocationHandler{
      * @author 蔡佳新
      */
     @Override
-    public Object getProxy(Class<?> clazz,
-                           ServerMark serverMark,
-                           Sender sender) {
+    public <T>T getProxy(Class<T> clazz,
+                         ServerMark serverMark,
+                         Sender sender) {
         super.serverMark = serverMark;
         super.sender = sender;
-        return Proxy.newProxyInstance(FeignProxy.class.getClassLoader(),
-                                      clazz.getInterfaces(),
-                                     this);
+        return (T)Proxy.newProxyInstance(FeignProxy.class.getClassLoader(),
+                                         clazz.getInterfaces(),
+                                        this);
     }
 
     @Override

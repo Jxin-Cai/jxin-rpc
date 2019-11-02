@@ -1,8 +1,10 @@
 package com.jxin.rpc.core.call.msg.mark;
 
 import com.jxin.rpc.core.util.serializer.ArgMarkUtil;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -15,11 +17,13 @@ import java.util.Objects;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MethodMark {
     /**方法名*/
-    private final String methodName;
+    private String methodName;
     /**参数标识符名 ,号拼接*/
-    private final String argMarkArrStr;
+    private String argMarkArrStr;
 
     @Override
     public boolean equals(Object o) {

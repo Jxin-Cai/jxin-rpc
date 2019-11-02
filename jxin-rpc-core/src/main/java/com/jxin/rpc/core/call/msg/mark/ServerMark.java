@@ -1,7 +1,9 @@
 package com.jxin.rpc.core.call.msg.mark;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 服务标识
@@ -11,11 +13,13 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ServerMark {
     /**服务名*/
-    private final String application;
+    private String application;
     /**接口全路径名*/
-    private final String interfaceName;
+    private String interfaceName;
 
 
 }

@@ -4,11 +4,10 @@ import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.feign.FeignFactory;
-import com.jxin.rpc.core.proxy.impl.cglib.FeignProxy;
+import com.jxin.rpc.core.proxy.impl.sdk.FeignProxy;
 import javassist.ClassPool;
 import javassist.CtClass;
-
-import java.lang.reflect.Method;
+import javassist.CtMethod;
 
 /**
  * 桩(装)工厂类 javassist框架实现类
@@ -35,12 +34,21 @@ public class DynamicFeignFactory implements FeignFactory {
             // 2. 获取接口
             final CtClass ccInterface = pool.getCtClass(insterfaceFullName);
             ccFeign.setInterfaces(new CtClass[]{ccInterface});
+            final CtMethod[] methods = ccInterface.getDeclaredMethods();
+            for (CtMethod method : methods) {
+                ccFeign.addMethod(new CtMethod(method.getReturnType(),
+                                               method.getName(),
+                                               method.getParameterTypes(),
+                                               ccFeign));
+            }
+
             // 3.生成类的字节码对象
             clazz = ccFeign.toClass();
         } catch (Exception e) {
             throw new InitFeignExc(e);
         }
+        final Object proxy = new FeignProxy().getProxy(clazz, serverMark, sender);
         // 返回这个桩
-        return (T) new FeignProxy().getProxy(clazz, serverMark, sender);
+        return (T) proxy;
     }
 }

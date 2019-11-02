@@ -38,6 +38,8 @@ public class AgentProviderHander implements ProviderHander, CenterContextSub {
             if(centerContext.getApplicationName().equals(reqMsg.getServerMark().getApplication())){
                 // 服务存在校验
                 serviceExistValidate(reqMsg);
+                // 调整为服务端
+                header.setProviderType(ProviderEnum.SERVER_PROVIDER.getType());
                 return centerContext.getLocalForwordFeign().forwordRemoteService(msg);
             }
             final List<ForwordFeign> forwordFeigns = centerContext.getApplicationFeignListMap()
@@ -77,7 +79,7 @@ public class AgentProviderHander implements ProviderHander, CenterContextSub {
 
     @Override
     public int type() {
-        return ProviderEnum.SERVER_PROVIDER.getType();
+        return ProviderEnum.AGENT_PROVIDER.getType();
     }
 
     @Override

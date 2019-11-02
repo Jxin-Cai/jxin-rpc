@@ -2,6 +2,7 @@ package com.jxin.rpc.server.start;
 
 import com.jxin.rpc.core.call.Server;
 import com.jxin.rpc.core.consts.ProviderEnum;
+import com.jxin.rpc.core.exc.InitFeignExc;
 import com.jxin.rpc.core.server.hander.ProviderHander;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import com.jxin.rpc.server.ServerStartPoint;
@@ -10,6 +11,8 @@ import com.jxin.rpc.server.scan.ApplicationContextSub;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 
 /**
@@ -42,7 +45,7 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint {
         }
     }
     @Override
-    public void startServer(int clientPort, int serverPort) throws InterruptedException {
+    public void startServer(int clientPort, int serverPort) {
         applicationContext = new ApplicationContext(PKG, URI.create("rpc://" + HOST + ":" + clientPort));
         // 服务端提供者
         initProviderHander(ProviderEnum.SERVER_PROVIDER);
@@ -53,7 +56,11 @@ public class LocalServerStartPoint extends Thread implements ServerStartPoint {
         // 开启服务
         if (server == null) {
             server = ServiceLoaderUtil.load(Server.class);
-            server.start(serverPort);
+            try {
+                server.start(serverPort);
+            }catch (Exception e){
+                throw new InitFeignExc(e);
+            }
         }
     }
     /**

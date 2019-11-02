@@ -76,7 +76,11 @@ public class ApplicationContext implements Closeable{
         putAllMethod();
         client = ServiceLoaderUtil.load(Client.class);
     }
-
+    public Object getServiceList(String serviceName){
+        final List<Object> objects = serviceContext.get(serviceName);
+        assert CollectionUtils.isNotEmpty(objects) : "none serviceList, name:" + serviceName;
+        return objects.stream().findFirst().orElseThrow(InitFeignExc::new);
+    }
     /**
      * 根据接口类全路径名 获取服务名
      * @param  interfaceName 接口类全路径名
@@ -129,6 +133,14 @@ public class ApplicationContext implements Closeable{
             }
         });
         serviceContext.values().forEach(this::injectToService);
+
+        try {
+            final Object hellow = getServiceList("Hellow");
+            final Method method = hellow.getClass().getMethod("hell");
+            method.invoke(hellow);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     //***********************************************injectRemoteService************************************************
@@ -152,8 +164,9 @@ public class ApplicationContext implements Closeable{
                 if(!needInject){
                     return;
                 }
-                final Object remoteService = remoteServiceContext.get(field.getDeclaringClass().getName());
+                final Object remoteService = remoteServiceContext.get(field.getType().getName());
                 try {
+                    field.setAccessible(true);
                     field.set(obj, remoteService);
                 } catch (IllegalAccessException e) {
                     throw new InitFeignExc(e);
@@ -261,18 +274,18 @@ public class ApplicationContext implements Closeable{
      */
     private boolean withoutPut(Object obj) {
         if(obj == null){
-            return false;
-        }
-        final AnnotatedType[] annotatedInterfaces = obj.getClass().getAnnotatedInterfaces();
-        if(ArrayUtils.isEmpty(annotatedInterfaces)){
             return true;
         }
-        for (AnnotatedType annotatedInterface : annotatedInterfaces) {
-            if(annotatedInterface instanceof Service){
-                return true;
+        final Annotation[] annotations = obj.getClass().getAnnotations();
+        if(ArrayUtils.isEmpty(annotations)){
+            return true;
+        }
+        for (Annotation annotation : annotations) {
+            if(annotation instanceof Service){
+                return false;
             }
         }
-        return false;
+        return true;
     }
     //***********************************************injectServiceContext***********************************************
     /**

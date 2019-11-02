@@ -8,6 +8,7 @@ import com.jxin.rpc.center.register.RegisterCenter;
 import com.jxin.rpc.center.register.RemoteService;
 import com.jxin.rpc.center.server.AccessPoint;
 import com.jxin.rpc.center.server.CenterContext;
+import com.jxin.rpc.center.server.CenterContextSub;
 import com.jxin.rpc.core.call.Client;
 import com.jxin.rpc.core.call.Sender;
 import com.jxin.rpc.core.call.Server;
@@ -19,6 +20,7 @@ import com.jxin.rpc.core.call.msg.mark.ServerMark;
 import com.jxin.rpc.core.consts.ProVersionConsts;
 import com.jxin.rpc.core.consts.ProviderEnum;
 import com.jxin.rpc.core.feign.FeignFactory;
+import com.jxin.rpc.core.server.hander.ProviderHander;
 import com.jxin.rpc.core.util.IdUtil;
 import com.jxin.rpc.core.util.serializer.SerializeUtil;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
@@ -132,6 +134,10 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
 
         // 拉取注册的服务
         CENTER_CONTEXT.setServiceContext(getRegisterService());
+        // 为提供者注入上下文
+        final CenterContextSub centerContextSub = (CenterContextSub)ProviderEnum.getByType(ProviderEnum.AGENT_PROVIDER.getType());
+        centerContextSub.setCenterContext(CENTER_CONTEXT);
+
         // 开启服务
         if (server == null) {
             server = ServiceLoaderUtil.load(Server.class);
@@ -165,6 +171,7 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         remoteServices.forEach(remoteService ->{
             remoteService.getServiceList()
                          .forEach(service -> remoteServerList.add(ServerMark.builder()
+                                                                            .application(remoteService.getApplicationName())
                                                                             .interfaceName(service)
                                                                             .build()));
         });

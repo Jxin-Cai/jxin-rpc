@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * @version 1.0
  * @since 2019/10/21 20:21
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Autowired {

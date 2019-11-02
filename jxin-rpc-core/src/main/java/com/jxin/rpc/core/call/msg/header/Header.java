@@ -19,7 +19,7 @@ public class Header {
     /**协议版本*/
     private final Integer version;
     /**提供者类型*/
-    private final Integer providerType;
+    private Integer providerType;
 
     /**
      * 获取当前实体bean属性值所占空间之和

@@ -1,6 +1,7 @@
 package com.jxin.rpc.server;
 
 import java.io.Closeable;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 服务端启动类
@@ -14,6 +15,6 @@ public interface ServerStartPoint extends Closeable {
      * @param  clientPort 客户端端口号
      * @param  serverPort 服务端端口号
      */
-    void startServer(int clientPort, int serverPort) throws InterruptedException;
+    void startServer(int clientPort, int serverPort) ;
 
 }

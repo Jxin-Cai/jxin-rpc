@@ -43,7 +43,7 @@ public abstract class AbstractFeignProxy{
      * @return 代理类实例
      * @author 蔡佳新
      */
-    public abstract Object getProxy(Class<?> clazz,
+    public abstract <T> T getProxy(Class<T> clazz,
                                     ServerMark serverMark,
                                     Sender sender) ;
 

@@ -1,1 +1,1 @@
-com.jxin.rpc.core.feign.impl.itranswarp.DynamicFeignFactory
+com.jxin.rpc.core.feign.impl.javassist.DynamicFeignFactory

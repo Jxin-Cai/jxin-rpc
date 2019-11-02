@@ -3,6 +3,8 @@ package com.jxin.rpc.demo.client;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import com.jxin.rpc.server.ServerStartPoint;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * 中心启动类
  * @author 蔡佳新
@@ -12,10 +14,11 @@ import com.jxin.rpc.server.ServerStartPoint;
 public class ClientApplication {
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         final ServerStartPoint serverStartPoint = ServiceLoaderUtil.load(ServerStartPoint.class);
         Runtime.getRuntime().addShutdownHook((Thread)serverStartPoint);
         serverStartPoint.startServer(5555, 9999);
+
     }
 
 

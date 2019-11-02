@@ -51,11 +51,6 @@ public class DynamicFeignFactory implements FeignFactory {
         } catch (Exception e) {
             throw new InitFeignExc(e);
         }
-        final Class<?>[] interfaces = clazz.getInterfaces();
-        final Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method declaredMethod : declaredMethods) {
-            System.out.println(declaredMethod.getName());
-        }
         // 返回这个桩
         return (T) new FeignProxy().getProxy(clazz, serverMark, sender);
     }

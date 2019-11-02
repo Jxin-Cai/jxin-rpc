@@ -1,8 +1,10 @@
 package com.jxin.rpc.core.call.msg;
 
 import com.jxin.rpc.core.call.msg.mark.ReturnArgMark;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 响应消息
