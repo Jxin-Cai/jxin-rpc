@@ -119,11 +119,10 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         // 注册服务
         CENTER_CONTEXT.setApplicationName(applicationName);
         registerCenter = getRegisterCenter(serviceUri);
-        final URI uri = URI.create("rpc://" + HOST + ":" + clientPort);
-        registerCenter.registerService(applicationName, uri);
+        registerCenter.registerService(applicationName, URI.create("rpc://" + HOST + ":" + clientPort));
 
         // 生成本地客户端请求桩
-        final Sender localSender = createSender(uri, CLIENT);
+        final Sender localSender = createSender(URI.create("rpc://" + HOST + ":" + serverPort), CLIENT);
         CENTER_CONTEXT.setLocalForwordFeign(
                 FEIGN_FACTORY.createFeign(localSender,
                                           ForwordFeign.class,

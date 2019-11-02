@@ -349,6 +349,7 @@ public class ApplicationContext implements Closeable{
         if(ArrayUtils.isEmpty(paramClassArr)){
             return MethodMark.builder()
                              .methodName(methodName)
+                             .argMarkArrStr("")
                              .build();
         }
         return MethodMark.builder()

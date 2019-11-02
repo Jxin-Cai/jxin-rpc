@@ -15,6 +15,7 @@ public class Hellow {
     private HelloWord helloWord;
 
     public void hell(){
-        System.out.println(helloWord.hello());
+        final String hello = helloWord.hello();
+        System.out.println(hello);
     }
 }

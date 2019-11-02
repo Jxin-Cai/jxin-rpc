@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
  * @since 2019/11/1 18:12
  */
 public class ServerApplication {
-    public static void main(String[] args) throws InterruptedException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void main(String[] args)  {
         final ServerStartPoint serverStartPoint = ServiceLoaderUtil.load(ServerStartPoint.class);
         Runtime.getRuntime().addShutdownHook((Thread)serverStartPoint);
         serverStartPoint.startServer(4444, 8888);

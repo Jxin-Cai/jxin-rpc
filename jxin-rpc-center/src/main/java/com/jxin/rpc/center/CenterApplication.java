@@ -27,12 +27,12 @@ public class CenterApplication {
             accessPoint = ServiceLoaderUtil.load(AccessPoint.class);
             Runtime.getRuntime().addShutdownHook((Thread)accessPoint);
             final File file = new File(getPath() + "application.properties");
-            accessPoint.startServer("jxin-client", file.toURI(), 9999, 5555);
-            //accessPoint.startServer("jxin-service", file.toURI(), 8888, 4444);
+            //accessPoint.startServer("jxin-client", file.toURI(), 5555, 9999);
+            accessPoint.startServer("jxin-service", file.toURI(), 4444, 8888);
 
             final List<RemoteService> remoteServices = mockRemoteServiceList();
             // 中添加远程服务转发feign实现
-            accessPoint.addRemoteService(remoteServices, file.toURI());
+            //accessPoint.addRemoteService(remoteServices, file.toURI());
         }catch (Exception e){
             log.error(e.getMessage(), e);
             if(accessPoint != null){

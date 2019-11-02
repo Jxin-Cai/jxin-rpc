@@ -44,7 +44,15 @@ public class ServerProviderHander implements ProviderHander, ApplicationContextS
 
             final Method method = applicationContext.getRegistMethod(reqMsg.getServerMark().getInterfaceName())
                                                     .get(reqMsg.getMethodMark());
-            final Object returnObj = method.invoke(service, reqMsg.getArgArr());
+            if(method == null){
+                return null;
+            }
+            final Object returnObj;
+            if(reqMsg.getArgArr() == null){
+                returnObj = method.invoke(service);
+            }else {
+                returnObj = method.invoke(service, reqMsg.getArgArr());
+            }
             return createMsgContext(header, returnObj);
         } catch (Exception e) {
             // 发生异常，返回UNKNOWN_ERROR错误响应。
