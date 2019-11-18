@@ -1,8 +1,7 @@
 package com.jxin.rpc.core.call;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
-
-import java.util.concurrent.CompletableFuture;
+import com.jxin.rpc.core.call.msg.manage.RspFuture;
 
 /**
  * 消息发送器接口
@@ -17,5 +16,5 @@ public interface Sender {
      * @return Future类型的 响应消息实体
      * @author 蔡佳新
      */
-    CompletableFuture<MsgContext> send(MsgContext msg);
+    RspFuture send(MsgContext msg);
 }

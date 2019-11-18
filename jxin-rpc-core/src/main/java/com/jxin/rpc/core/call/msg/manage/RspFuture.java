@@ -1,10 +1,9 @@
 package com.jxin.rpc.core.call.msg.manage;
 
 import com.jxin.rpc.core.call.msg.MsgContext;
+import io.netty.util.concurrent.DefaultPromise;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 聚合Future类型响应消息实体的响应体
@@ -14,11 +13,9 @@ import java.util.concurrent.CompletableFuture;
  */
 @Data
 @Builder
-public class RspFuture {
+public class RspFuture extends DefaultPromise<MsgContext>{
     /**请求id*/
     private final String requestId;
     /**时间截*/
     private final long timestamp;
-    /**Future类型的 响应消息实体*/
-    private final CompletableFuture<MsgContext> future;
 }

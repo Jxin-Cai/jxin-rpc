@@ -16,6 +16,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -112,6 +114,7 @@ public class NettyClient implements Client {
                 channel.pipeline()
                         .addLast(new RspDecoder())
                         .addLast(new ReqEncoder())
+                        .addLast(new LoggingHandler(LogLevel.INFO))
                         .addLast(RSP_COMPLETE_HANDER);
             }
         };

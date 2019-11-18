@@ -12,6 +12,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 /**
  * 服务端 netty实现
@@ -73,6 +75,7 @@ public class NettyServer implements Server {
                 channel.pipeline()
                         .addLast(new ReqDecoder())
                         .addLast(new RspEncoder())
+                        .addLast(new LoggingHandler(LogLevel.INFO))
                         .addLast(PROVIDER_DISPATCH_HANDER);
             }
         };

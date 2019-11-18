@@ -30,7 +30,7 @@ public class RspCompleteHander extends SimpleChannelInboundHandler<MsgContext> {
             log.info("rspFuture is Deleted");
             return;
         }
-        rspFuture.getFuture().complete(msg);
+        rspFuture.setSuccess(msg);
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
