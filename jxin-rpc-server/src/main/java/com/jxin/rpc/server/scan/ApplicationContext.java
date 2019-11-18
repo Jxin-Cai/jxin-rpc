@@ -232,25 +232,14 @@ public class ApplicationContext implements Closeable{
      */
     private void putService(Object obj) {
         final Class<?> clazz = obj.getClass();
-        for (Class<?> interfaceClass : clazz.getInterfaces()) {
-            final Annotation[] annotations = interfaceClass.getAnnotations();
-            if(Arrays.stream(annotations).anyMatch(this::isRegistService)){
+
+        for (Class<?> interfaceClass : clazz.getInterfaces()) { ;
+            if(clazz.isAnnotationPresent(RegistService.class)){
                 registServiceContext.put(interfaceClass.getName(), obj);
             }
         }
         putServiceContext(obj, clazz.getSimpleName());
     }
-
-    /**
-     * 判断注解是不是 {@link RegistService}的实例
-     * @param  annotation 注解
-     * @return 如果注解是 {@link RegistService}的实例则返回 true
-     * @author 蔡佳新
-     */
-    private boolean isRegistService(Annotation annotation) {
-        return annotation instanceof RegistService;
-    }
-
     /**
      * 往注册服务上下文添加服务实现类
      * @param  obj          服务实现类
@@ -276,16 +265,7 @@ public class ApplicationContext implements Closeable{
         if(obj == null){
             return true;
         }
-        final Annotation[] annotations = obj.getClass().getAnnotations();
-        if(ArrayUtils.isEmpty(annotations)){
-            return true;
-        }
-        for (Annotation annotation : annotations) {
-            if(annotation instanceof Service){
-                return false;
-            }
-        }
-        return true;
+        return !obj.getClass().isAnnotationPresent(Service.class);
     }
     //***********************************************injectServiceContext***********************************************
     /**
