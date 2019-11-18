@@ -3,8 +3,6 @@ package com.jxin.rpc.demo.server;
 import com.jxin.rpc.core.util.spi.ServiceLoaderUtil;
 import com.jxin.rpc.server.ServerStartPoint;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * @author 蔡佳新
  * @version 1.0

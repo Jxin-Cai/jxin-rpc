@@ -61,9 +61,11 @@ public class RspMsgSerializer implements Serializer<RspMsg> {
         if(returnArgMark == null){
             throw new SerializeExc("non null returnArgMark");
         }
+
         final Class<?> clazz = ArgMarkUtil.getClazz(returnArgMark.getClassMark());
         final int returnArgLen = buffer.getInt();
         final byte [] returnArgByteArr = new byte[returnArgLen];
+        buffer.get(returnArgByteArr);
         // list序列化时
         if(returnArgMark.isMulti()){
             final List<?> returnArgList = ProtoStuffUtil.deserializeList(returnArgByteArr, clazz);

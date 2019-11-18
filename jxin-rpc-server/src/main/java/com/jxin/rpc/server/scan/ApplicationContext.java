@@ -133,7 +133,7 @@ public class ApplicationContext implements Closeable{
             }
         });
         serviceContext.values().forEach(this::injectToService);
-
+        // TODO 手動调用
         try {
             final Object hellow = getServiceList("Hellow");
             final Method method = hellow.getClass().getMethod("hell");
@@ -234,7 +234,7 @@ public class ApplicationContext implements Closeable{
         final Class<?> clazz = obj.getClass();
 
         for (Class<?> interfaceClass : clazz.getInterfaces()) { ;
-            if(clazz.isAnnotationPresent(RegistService.class)){
+            if(interfaceClass.isAnnotationPresent(RegistService.class)){
                 registServiceContext.put(interfaceClass.getName(), obj);
             }
         }

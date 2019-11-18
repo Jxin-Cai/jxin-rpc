@@ -119,10 +119,10 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
         // 注册服务
         CENTER_CONTEXT.setApplicationName(applicationName);
         registerCenter = getRegisterCenter(serviceUri);
-        registerCenter.registerService(applicationName, URI.create("rpc://" + HOST + ":" + clientPort));
+        registerCenter.registerService(applicationName, URI.create("rpc://" + HOST + ":" + serverPort));
 
         // 生成本地客户端请求桩
-        final Sender localSender = createSender(URI.create("rpc://" + HOST + ":" + serverPort), CLIENT);
+        final Sender localSender = createSender(URI.create("rpc://" + HOST + ":" + clientPort), CLIENT);
         CENTER_CONTEXT.setLocalForwordFeign(
                 FEIGN_FACTORY.createFeign(localSender,
                                           ForwordFeign.class,
@@ -175,16 +175,17 @@ public class AgentCenterAccessPoint extends Thread implements AccessPoint {
                                                                             .build()));
         });
 
-        final MsgContext reqMsgContext = MsgContext.builder()
-                                                   .header(ReqHeader.builder()
-                                                                    .requestId(IdUtil.getUUID())
-                                                                    .version(ProVersionConsts.VERSION_1)
-                                                                    .type(ProviderEnum.REMOTE_FEIGN_PROVIDER.getType())
-                                                                    .build())
-                                                   .body(SerializeUtil.serialize(RemoteServerMark.builder()
-                                                                                                 .remoteServerList(remoteServerList)
-                                                                                                 .build()))
-                                                   .build();
+        final MsgContext reqMsgContext =
+                MsgContext.builder()
+                          .header(ReqHeader.builder()
+                                           .requestId(IdUtil.getUUID())
+                                           .version(ProVersionConsts.VERSION_1)
+                                           .type(ProviderEnum.REMOTE_FEIGN_PROVIDER.getType())
+                                           .build())
+                          .body(SerializeUtil.serialize(RemoteServerMark.builder()
+                                                                        .remoteServerList(remoteServerList)
+                                                                        .build()))
+                          .build();
         CENTER_CONTEXT.getLocalForwordFeign().pushRemoteService(reqMsgContext);
     }
     /**

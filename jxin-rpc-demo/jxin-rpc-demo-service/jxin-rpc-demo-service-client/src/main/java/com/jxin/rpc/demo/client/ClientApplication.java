@@ -18,7 +18,6 @@ public class ClientApplication {
         final ServerStartPoint serverStartPoint = ServiceLoaderUtil.load(ServerStartPoint.class);
         Runtime.getRuntime().addShutdownHook((Thread)serverStartPoint);
         serverStartPoint.startServer(5555, 9999);
-
     }
 
 
