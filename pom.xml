@@ -31,7 +31,7 @@
         <maven-compiler-plugin.compilerArgument>-parameters</maven-compiler-plugin.compilerArgument>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <!--test-->
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <!--动代-->
         <cglib.version>3.3.0</cglib.version>
         <javassist.version>3.21.0-GA</javassist.version>
